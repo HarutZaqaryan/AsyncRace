@@ -1,0 +1,25 @@
+.winners__heading {
+  max-width: 1000px;
+  margin: 0 auto;
+  margin-top: 20px;
+  color: #fff;
+  font-size: 30px;
+  letter-spacing: 5px;
+}
+
+.winners__container {
+  max-width: 1000px;
+  margin: 0 auto;
+  margin-top: 25px;
+}
+
+.winners__footer {
+  max-width: 1000px;
+  margin: 50px auto;
+  color: #fff;
+  font-size: 30px;
+}
+
+.mat-mdc-table tbody, .mat-mdc-table tfoot, .mat-mdc-table thead, .mat-mdc-cell, .mat-mdc-footer-cell, .mat-mdc-header-row, .mat-mdc-row, .mat-mdc-footer-row, .mat-mdc-table .mat-mdc-header-cell {
+    background-color: #b6cbff;
+}

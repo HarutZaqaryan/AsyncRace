@@ -1,0 +1,125 @@
+input,
+button {
+  height: 25px;
+}
+
+.garage__container {
+  border-top: 7px dashed #fff;
+  border-bottom: 7px dashed #fff;
+  min-height: 130px;
+  max-width: 1000px;
+  margin: 0 auto;
+  margin-top: 25px;
+  border-left: 3px dotted #fff;
+  border-right: 3px dotted #fff;
+}
+
+.garage__actions {
+  max-width: 1000px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 auto;
+  margin-top: 20px;
+
+  .race__actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .create-update__actions {
+    display: flex;
+    justify-content: space-between;
+    width: 60%;
+
+    .c_a-input {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    input[type="text"] {
+      width: 150px;
+    }
+    input[type="color"] {
+      width: 30px;
+    }
+  }
+}
+
+.racing__line {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 1px;
+}
+
+.line__actions {
+  width: 130px;
+  display: flex;
+  flex-direction: row;
+  .car__actions {
+    button {
+      width: 80px;
+      text-align: center;
+    }
+  }
+  .engine__actions {
+    button {
+      font-size: 18px;
+      font-weight: 700;
+      width: 30px;
+      text-align: center;
+    }
+  }
+}
+
+.track {
+  border-top: 3px dashed #fff;
+  border-bottom: 3px dashed #fff;
+  border-left: 2px dotted red;
+  border-right: 2px dotted green;
+  width: 680px;
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  p {
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 3px;
+    transform: rotate(90deg);
+    font-style: italic;
+  }
+
+  .car-name {
+    width: 500px;
+    font-size: 30px;
+    letter-spacing: 10px;
+    font-weight: 700;
+  }
+
+  .start {
+    color: red;
+  }
+  .finish {
+    color: green;
+  }
+}
+
+// .car {
+//   z-index: 10;
+//   transform: translateX(775px);
+// }
+
+.garage__footer {
+  max-width: 1000px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px auto;
+  font-size: 25px;
+  color: #fff;
+}
