@@ -9,6 +9,7 @@ import {
 import { CarsServivce } from '../../../Services/cars-service';
 import { ICars } from '../../../Models/ICars';
 import { HttpResponse } from '@angular/common/http';
+import { PaginationComponent } from '../../../Shared/pagination/pagination.component';
 
 export const overallRaceAnimation = function () {
   return trigger('race', [
@@ -42,7 +43,7 @@ export const overallRaceAnimation = function () {
   selector: 'app-garage',
   standalone: true,
   animations: [overallRaceAnimation()],
-  imports: [],
+  imports: [PaginationComponent],
   templateUrl: './garage.component.html',
   styleUrl: './garage.component.scss',
 })
