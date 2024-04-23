@@ -109,10 +109,9 @@ button {
   }
 }
 
-// .car {
-//   z-index: 10;
-//   transform: translateX(775px);
-// }
+.car {
+  z-index: 10;
+}
 
 .garage__footer {
   max-width: 1000px;
@@ -122,4 +121,15 @@ button {
   margin: 20px auto;
   font-size: 25px;
   color: #fff;
+}
+
+.pagination {
+  width: 200px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  p {
+    margin-top: 5px;
+  }
 }
