@@ -83,9 +83,9 @@ export class GarageComponent implements OnInit {
     });
   }
 
-  // onPageChange(page: number): void {
-  //   this.currentPage = page;
-  //   console.log('current page', this.currentPage);
-  //   this.getCars(this.carsPerPage, this.currentPage);
-  // }
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    console.log('current page', this.currentPage);
+    this.getCars(this.carsPerPage, this.currentPage);
+  }
 }
