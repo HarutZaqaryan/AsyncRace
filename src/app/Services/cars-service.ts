@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ICars } from '../Models/ICars';
 import { Observable, forkJoin } from 'rxjs';
@@ -230,8 +230,11 @@ export class CarsServivce {
     return carsList100;
   }
 
-  getCars(limit:number,page:number) { 
-    return this.http.get<ICars[]>(`${this.carsUrl}?_limit=${limit}&&_page=${page}`,{observe:'response'});
+  getCars(limit: number, page: number) {
+    return this.http.get<ICars[]>(
+      `${this.carsUrl}?_limit=${limit}&&_page=${page}`,
+      { observe: 'response' }
+    );
   }
 
   generateCars() {
@@ -248,5 +251,28 @@ export class CarsServivce {
     });
 
     return forkJoin(observables);
+  }
+
+  createCar(carName: string, carColor: string) {
+    return this.http.post<TCar>(
+      this.carsUrl,
+      { name: carName, color: carColor },
+      { headers: { 'Content-type': 'application/json' } }
+    );
+  }
+
+  updateCar(id: number, carNewName: string, carNewColor: string) {
+    return this.http.put<TCar>(
+      `${this.carsUrl}/${id}`,
+      { name: carNewName, color: carNewColor },
+      { headers: { 'Content-type': 'application/json' } }
+    );
+  }
+
+  removeCar(id: number) {
+    return this.http.delete(`${this.carsUrl}/${id}`);
+    // ! I tried adding parameters this way, but it's not working.
+    // let params = new HttpParams().set('id',id.toString())
+    // return this.http.delete(this.carsUrl,{params});
   }
 }

@@ -41,4 +41,5 @@ export class WinnersComponent {
     'bestTime',
   ];
   dataSource = ELEMENT_DATA;
+  
 }

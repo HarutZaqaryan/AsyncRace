@@ -6,15 +6,23 @@
 
   <div class="create-update__actions">
     <div class="c_a-input">
-      <input type="text" placeholder="Name" />
-      <input type="Color" placeholder="Color" />
-      <button>Create</button>
+      <input type="text" placeholder="Name" [formControl]="creatingCarsName" />
+      <input
+        type="Color"
+        placeholder="Color"
+        [formControl]="creatingCarsColor"
+      />
+      <button (click)="createCar()">Create</button>
     </div>
 
     <div class="c_a-input">
-      <input type="text" placeholder="Name" />
-      <input type="Color" placeholder="Color" />
-      <button>Update</button>
+      <input type="text" placeholder="Name" [formControl]="updatingCarsName" />
+      <input
+        type="Color"
+        placeholder="Color"
+        [formControl]="updatingCarsColor"
+      />
+      <button [disabled]="!selected" (click)="updateCar()">Update</button>
     </div>
   </div>
 
@@ -29,8 +37,8 @@
     <div class="racing__line">
       <div class="line__actions">
         <div class="car__actions">
-          <button>Select</button>
-          <button>Remove</button>
+          <button (click)="selectCar(car.id)">Select</button>
+          <button (click)="removeCar(car.id)">Remove</button>
         </div>
         <div class="engine__actions">
           <button>S</button>
@@ -41,7 +49,7 @@
         class="car"
         [@race]="{
           value: animationAction === 'start' ? 'start' : 'reset',
-          params: { speed: 5 }
+          params: { speed: 640 }
         }"
       >
         <svg
@@ -128,3 +136,4 @@
     (onPageChange)="onPageChange($event)"
   ></app-pagination>
 </div>
+
