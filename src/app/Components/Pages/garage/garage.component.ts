@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
 import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
+  AfterContentInit,
+  Component,
+  ElementRef,
+  OnInit,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
 import { CarsServivce } from '../../../Services/cars-service';
 import { ICars } from '../../../Models/ICars';
 import { HttpResponse } from '@angular/common/http';
@@ -16,84 +16,69 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-
-export const overallRaceAnimation = function () {
-  return trigger('race', [
-    state(
-      'stop',
-      style({
-        transform: 'translateX(0)',
-      })
-    ),
-
-    state(
-      'start',
-      style({
-        transform: 'translateX(775px)',
-      })
-    ),
-    state(
-      'reset',
-      style({
-        transform: 'translateX(0)',
-      })
-    ),
-    transition('reset => start', [animate('{{speed}}ms ease-in')], {
-      params: { speed: 1 },
-    }),
-    transition('start => reset', [animate('0.1s ease-in')]),
-  ]);
-};
+import { EngineService } from '../../../Services/engine-service';
+import { catchError, combineLatest, of } from 'rxjs';
 
 @Component({
   selector: 'app-garage',
   standalone: true,
-  animations: [overallRaceAnimation()],
+  animations: [],
   imports: [PaginationComponent, FormsModule, ReactiveFormsModule],
   templateUrl: './garage.component.html',
   styleUrl: './garage.component.scss',
 })
-export class GarageComponent implements OnInit {
-  animationAction: string = 'stop';
+export class GarageComponent implements OnInit, AfterContentInit {
   cars: ICars[] = [];
-  carsPerPage: number = 3;
+  carElements: ElementRef[] = [];
+  carsPerPage: number = 5;
   currentPage: number = 1;
   carsTotalCount: number = 0;
   selected: boolean = false;
   updatingCarsId: number = 0;
+  animationAction: string = 'stop';
+  @ViewChildren('animatingCars') animatingCars!: QueryList<ElementRef>;
+  workingCars: ICars[] = [];
 
-  creatingCarsName: FormControl = new FormControl('', [Validators.required,Validators.minLength(2)]);
+  creatingCarsName: FormControl = new FormControl('', [
+    Validators.required,
+    Validators.minLength(2),
+  ]);
   creatingCarsColor: FormControl = new FormControl('#000000');
-  updatingCarsName: FormControl = new FormControl('', [Validators.required,Validators.minLength(2)]);
+  updatingCarsName: FormControl = new FormControl('', [
+    Validators.required,
+    Validators.minLength(2),
+  ]);
   updatingCarsColor: FormControl = new FormControl('#000000');
 
-  constructor(private carsService: CarsServivce) {}
+  constructor(
+    private carsService: CarsServivce,
+    private engineService: EngineService
+  ) {}
 
   ngOnInit(): void {
     this.getCars(this.carsPerPage, this.currentPage);
   }
 
-  overallRaceAdminister(action: string) {
-    this.animationAction = action;
-    overallRaceAnimation();
+  ngAfterContentInit(): void {
+    setTimeout(() => {
+      this.animatingCars.forEach((carElem: ElementRef) => {
+        this.carElements.push(carElem);
+      });
+    }, 0);
   }
 
   getCars(limit: number, page: number): void {
     this.carsService
       .getCars(limit, page)
       .subscribe((res: HttpResponse<ICars[]>) => {
-        console.log('headers', res.headers.get('X-Total-Count'));
-        console.log('cars', res.body);
         this.cars = res.body ?? [];
         this.carsTotalCount = +res.headers.get('X-Total-Count')!;
-        console.log('cars - getCars()', this.cars);
       });
   }
 
   generateCarsAutomaticly(): void {
     this.carsService.generateCars().subscribe((res) => {
       this.getCars(this.carsPerPage, this.currentPage);
-      console.log('cars - generateCars()', this.cars);
     });
   }
 
@@ -118,6 +103,7 @@ export class GarageComponent implements OnInit {
             this.creatingCarsColor.setValue('#000000');
           });
       } else {
+        // ToDo // Input Errors
         console.log('car already exist');
       }
     }
@@ -156,6 +142,7 @@ export class GarageComponent implements OnInit {
             this.updatingCarsColor.setValue('#000000');
           });
       } else {
+        // ToDo // Input Errors
         console.log('car with this name already exist');
       }
     }
@@ -172,6 +159,109 @@ export class GarageComponent implements OnInit {
         this.getCars(this.carsPerPage, this.currentPage);
       }
     });
+  }
+
+  start_stopEngine(id: number, status: string) {
+    this.engineService.start_stopEngine(id, status).subscribe((res) => {
+      let car = this.cars.find((car) => car.id === id);
+      car!.velocity = res.velocity;
+      car!.distance = res.distance;
+      console.log('from start-stop', status, car!.name, '-', car!.velocity);
+    });
+  }
+
+  overallRaceAdminister(action: string) {
+    this.workingCars = [];
+    if (action === 'start') {
+      const requests = this.cars.map((car) => {
+        this.start_stopEngine(car.id, 'started');
+        return this.engineService.engineMode(car.id, 'drive').pipe(
+          catchError((err) => {
+            this.start_stopEngine(car.id, 'stopped');
+            return of(err);
+          })
+        );
+      });
+      combineLatest(requests).subscribe((res) => {
+        res.forEach((result) => {
+          if (result.statusText === 'OK') {
+            let splitedUrl = result.url.split('=');
+            let workingCar = this.cars.find(
+              (car) => car.id == +splitedUrl[1][0]
+            );
+            this.workingCars.push(workingCar!);
+          }
+        });
+        let screenWidth = window.screen.width;
+        let trackDistance = (60.55 / 100) * screenWidth;
+        this.raceAnimation(
+          'start',
+          Math.floor(trackDistance),
+          this.workingCars
+        );
+      });
+    } else {
+      this.cars.map((car) => {
+        this.start_stopEngine(car.id, 'stopped');
+      });
+      this.raceAnimation('stop');
+    }
+  }
+
+  individualCarAnimation(
+    carElement: HTMLDivElement,
+    car: ICars,
+    status: string
+  ) {
+    let screenWidth = window.screen.width;
+    let trackDistance = (60.55 / 100) * screenWidth;
+    if (status === 'started') {
+      this.start_stopEngine(car.id, 'started');
+      this.engineService.engineMode(car.id, 'drive').subscribe(
+        (res) => {
+          carElement.style.transition = `${car.velocity}0ms ease-in`;
+          carElement.style.transform = `translateX(${trackDistance}px)`;
+        },
+        (err) => {
+          this.start_stopEngine(car.id, 'stopped');
+        }
+      );
+    } else {
+      this.start_stopEngine(car.id, 'stopped');
+      carElement.style.transition = '1ms ease-in';
+      carElement.style.transform = 'translateX(0px)';
+    }
+  }
+
+  raceAnimation(action: string, trackDistance?: number, workingCars?: ICars[]) {
+    // ToDo // Race Loading
+    if (this.carElements) {
+      if (action === 'start') {
+        let workingCarIds: number[] = [];
+        workingCars!.map((workingCar) => {
+          workingCarIds.push(workingCar.id);
+        });
+        let workingCarHTMLelements: ElementRef[] = [];
+        this.carElements.forEach((carElem: ElementRef, index) => {
+          if (workingCarIds!.includes(+carElem.nativeElement.id)) {
+            workingCarHTMLelements.push(carElem);
+          }
+        });
+        workingCarHTMLelements.forEach((carElem: ElementRef, index) => {
+          carElem.nativeElement.style.transition = `${
+            workingCars![index].velocity
+          }0ms ease-in`;
+          carElem.nativeElement.style.transform = `translateX(${trackDistance}px)`;
+        });
+      } else {
+        this.carElements.forEach((carElem: ElementRef) => {
+          carElem.nativeElement.style.transition = '1ms ease-in';
+          carElem.nativeElement.style.transform = 'translateX(0px)';
+        });
+      }
+    }
+    // * get winners
+    console.log('finish', this.workingCars);
   }
 
   onPageChange(page: number): void {

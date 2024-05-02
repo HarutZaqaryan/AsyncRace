@@ -1,6 +1,7 @@
 <div class="garage__actions">
   <div class="race__actions">
     <button (click)="overallRaceAdminister('start')">Race</button>
+    <!-- ToDo // Race Loading -->
     <button (click)="overallRaceAdminister('reset')">Reset</button>
   </div>
 
@@ -40,18 +41,15 @@
           <button (click)="selectCar(car.id)">Select</button>
           <button (click)="removeCar(car.id)">Remove</button>
         </div>
+
         <div class="engine__actions">
-          <button>S</button>
-          <button>R</button>
+          <button (click)="individualCarAnimation(individualCarElement,car,'started')">S</button>
+          <!-- ToDo // Engine Info -->
+          <button (click)="individualCarAnimation(individualCarElement,car,'stopped')">R</button>
         </div>
       </div>
-      <div
-        class="car"
-        [@race]="{
-          value: animationAction === 'start' ? 'start' : 'reset',
-          params: { speed: 640 }
-        }"
-      >
+
+      <div class="car" #individualCarElement #animatingCars [id]="car.id">
         <svg
           width="100px"
           height="100px"
@@ -117,6 +115,7 @@
           </g>
         </svg>
       </div>
+
       <div class="track">
         <p class="start">Start</p>
         <h3 class="car-name">{{ car.name }}</h3>
@@ -136,4 +135,3 @@
     (onPageChange)="onPageChange($event)"
   ></app-pagination>
 </div>
-

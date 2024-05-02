@@ -272,7 +272,7 @@ export class CarsServivce {
   removeCar(id: number) {
     return this.http.delete(`${this.carsUrl}/${id}`);
     // ! I tried adding parameters this way, but it's not working.
-    // let params = new HttpParams().set('id',id.toString())
+    // let params = new HttpParams().set('id',id)
     // return this.http.delete(this.carsUrl,{params});
   }
 }
