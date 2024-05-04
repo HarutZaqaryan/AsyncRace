@@ -1,8 +1,8 @@
 <div class="garage__actions">
   <div class="race__actions">
-    <button (click)="overallRaceAdminister('start')">Race</button>
+    <button (click)="overallRaceAdminister('start')" [disabled]="disableRaceButton">Race</button>
     <!-- ToDo // Race Loading -->
-    <button (click)="overallRaceAdminister('reset')">Reset</button>
+    <button (click)="overallRaceAdminister('reset')" [disabled]="disableResetButton">Reset</button>
   </div>
 
   <div class="create-update__actions">
@@ -49,7 +49,7 @@
         </div>
       </div>
 
-      <div class="car" #individualCarElement #animatingCars [id]="car.id">
+      <div class="car" #individualCarElement #animatingCars id={{car.id}}>
         <svg
           width="100px"
           height="100px"
@@ -118,7 +118,7 @@
 
       <div class="track">
         <p class="start">Start</p>
-        <h3 class="car-name">{{ car.name }}</h3>
+        <h3 class="car-name">{{ car.name }} - {{car.id}}</h3>
         <p class="finish">Finish</p>
       </div>
     </div>

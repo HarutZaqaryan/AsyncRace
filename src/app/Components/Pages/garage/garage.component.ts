@@ -6,7 +6,7 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core';
-import { CarsServivce } from '../../../Services/cars-service';
+import { CarsServivce } from '../../../Services/cars.service';
 import { ICars } from '../../../Models/ICars';
 import { HttpResponse } from '@angular/common/http';
 import { PaginationComponent } from '../../../Shared/pagination/pagination.component';
@@ -16,14 +16,21 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { EngineService } from '../../../Services/engine-service';
+import { EngineService } from '../../../Services/engine.service';
 import { catchError, combineLatest, of } from 'rxjs';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { WinnersPopupComponent } from '../../winners-popup/winners-popup.component';
 
 @Component({
   selector: 'app-garage',
   standalone: true,
   animations: [],
-  imports: [PaginationComponent, FormsModule, ReactiveFormsModule],
+  imports: [
+    PaginationComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+  ],
   templateUrl: './garage.component.html',
   styleUrl: './garage.component.scss',
 })
@@ -36,6 +43,8 @@ export class GarageComponent implements OnInit, AfterContentInit {
   selected: boolean = false;
   updatingCarsId: number = 0;
   animationAction: string = 'stop';
+  disableRaceButton: boolean = false;
+  disableResetButton: boolean = true;
   @ViewChildren('animatingCars') animatingCars!: QueryList<ElementRef>;
   workingCars: ICars[] = [];
 
@@ -52,7 +61,8 @@ export class GarageComponent implements OnInit, AfterContentInit {
 
   constructor(
     private carsService: CarsServivce,
-    private engineService: EngineService
+    private engineService: EngineService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -162,6 +172,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
   }
 
   start_stopEngine(id: number, status: string) {
+    this.disableRaceButton = true;
     this.engineService.start_stopEngine(id, status).subscribe((res) => {
       let car = this.cars.find((car) => car.id === id);
       car!.velocity = res.velocity;
@@ -187,7 +198,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
           if (result.statusText === 'OK') {
             let splitedUrl = result.url.split('=');
             let workingCar = this.cars.find(
-              (car) => car.id == +splitedUrl[1][0]
+              (car) => car.id == +splitedUrl[1].split('&')[0]
             );
             this.workingCars.push(workingCar!);
           }
@@ -234,14 +245,23 @@ export class GarageComponent implements OnInit, AfterContentInit {
   }
 
   raceAnimation(action: string, trackDistance?: number, workingCars?: ICars[]) {
+    this.carElements = [];
+    this.animatingCars.forEach((carElem: ElementRef) => {
+      this.carElements.push(carElem);
+    });
+    if (!workingCars?.length) {
+      this.disableResetButton = true;
+    }
     // ToDo // Race Loading
     if (this.carElements) {
       if (action === 'start') {
         let workingCarIds: number[] = [];
+
         workingCars!.map((workingCar) => {
           workingCarIds.push(workingCar.id);
         });
         let workingCarHTMLelements: ElementRef[] = [];
+
         this.carElements.forEach((carElem: ElementRef, index) => {
           if (workingCarIds!.includes(+carElem.nativeElement.id)) {
             workingCarHTMLelements.push(carElem);
@@ -253,15 +273,40 @@ export class GarageComponent implements OnInit, AfterContentInit {
           }0ms ease-in`;
           carElem.nativeElement.style.transform = `translateX(${trackDistance}px)`;
         });
+        console.log('finish', this.workingCars);
+        this.disableResetButton = false;
+
+        if (workingCars?.length) {
+          this.getWinners(workingCars);
+        }
       } else {
+        this.disableRaceButton = false;
+        this.disableResetButton = true;
+
         this.carElements.forEach((carElem: ElementRef) => {
           carElem.nativeElement.style.transition = '1ms ease-in';
           carElem.nativeElement.style.transform = 'translateX(0px)';
         });
       }
     }
-    // * get winners
-    console.log('finish', this.workingCars);
+  }
+
+  getWinners(cars: ICars[]) {
+    let carVelocities: number[] = [];
+    let winners: ICars[] = [];
+    cars.map((car) => {
+      carVelocities.push(car.velocity!);
+    });
+    let fastestCarVelocity = Math.min(...carVelocities);
+    let fastestCars = cars.filter((car) => car.velocity === fastestCarVelocity);
+    fastestCars.forEach((car) => {
+      winners.push(car);
+    });
+    setTimeout(() => {
+      this.dialog.open(WinnersPopupComponent, {
+        data: winners,
+      });
+    }, winners[0].velocity! * 2 * 10);
   }
 
   onPageChange(page: number): void {
