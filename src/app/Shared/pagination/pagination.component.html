@@ -7,7 +7,7 @@
   </button>
   <p>Page {{ currentPage }}</p>
   <button
-    [disabled]="currentPage * carsPerPage >= carsTotalCount"
+    [disabled]="currentPage * carsPerPage >= totalCount"
     (click)="callParentOnPageChange(currentPage + 1)"
   >
     >

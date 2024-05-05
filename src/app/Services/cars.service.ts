@@ -237,6 +237,10 @@ export class CarsServivce {
     );
   }
 
+  getCar(id: number) {
+    return this.http.get<ICars>(`${this.carsUrl}/${id}`);
+  }
+
   generateCars() {
     const observables: Observable<TCar>[] = [];
 

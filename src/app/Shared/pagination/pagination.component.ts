@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ICars } from '../../Models/ICars';
 
 @Component({
   selector: 'app-pagination',
@@ -10,7 +9,7 @@ import { ICars } from '../../Models/ICars';
 })
 export class PaginationComponent {
   @Input() currentPage = 1;
-  @Input() carsTotalCount = 0;
+  @Input() totalCount = 0;
   @Input() carsPerPage = 3;
 
   @Output() onPageChange:EventEmitter<any> = new EventEmitter();

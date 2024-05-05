@@ -39,7 +39,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
   carElements: ElementRef[] = [];
   carsPerPage: number = 5;
   currentPage: number = 1;
-  carsTotalCount: number = 0;
+  totalCount: number = 0;
   selected: boolean = false;
   updatingCarsId: number = 0;
   animationAction: string = 'stop';
@@ -82,7 +82,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
       .getCars(limit, page)
       .subscribe((res: HttpResponse<ICars[]>) => {
         this.cars = res.body ?? [];
-        this.carsTotalCount = +res.headers.get('X-Total-Count')!;
+        this.totalCount = +res.headers.get('X-Total-Count')!;
       });
   }
 

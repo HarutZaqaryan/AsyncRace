@@ -118,7 +118,7 @@
 
       <div class="track">
         <p class="start">Start</p>
-        <h3 class="car-name">{{ car.name }} - {{car.id}}</h3>
+        <h3 class="car-name">{{ car.name }}</h3>
         <p class="finish">Finish</p>
       </div>
     </div>
@@ -127,11 +127,11 @@
 </div>
 
 <div class="garage__footer">
-  <p>Garage({{ carsTotalCount }})</p>
+  <p>Garage({{ totalCount }})</p>
   <app-pagination
     [carsPerPage]="carsPerPage"
     [currentPage]="currentPage"
-    [carsTotalCount]="carsTotalCount"
+    [totalCount]="totalCount"
     (onPageChange)="onPageChange($event)"
   ></app-pagination>
 </div>
