@@ -17,9 +17,11 @@ import {
   Validators,
 } from '@angular/forms';
 import { EngineService } from '../../../Services/engine.service';
-import { catchError, combineLatest, of } from 'rxjs';
+import { catchError, combineLatest, of, switchMap } from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { WinnersPopupComponent } from '../../winners-popup/winners-popup.component';
+import { WinnersService } from '../../../Services/winners.service';
+import { IWinners } from '../../../Models/IWinners';
 
 @Component({
   selector: 'app-garage',
@@ -37,7 +39,7 @@ import { WinnersPopupComponent } from '../../winners-popup/winners-popup.compone
 export class GarageComponent implements OnInit, AfterContentInit {
   cars: ICars[] = [];
   carElements: ElementRef[] = [];
-  carsPerPage: number = 5;
+  carsPerPage: number = 10;
   currentPage: number = 1;
   totalCount: number = 0;
   selected: boolean = false;
@@ -52,16 +54,17 @@ export class GarageComponent implements OnInit, AfterContentInit {
     Validators.required,
     Validators.minLength(2),
   ]);
-  creatingCarsColor: FormControl = new FormControl('#000000');
   updatingCarsName: FormControl = new FormControl('', [
     Validators.required,
     Validators.minLength(2),
   ]);
+  creatingCarsColor: FormControl = new FormControl('#000000');
   updatingCarsColor: FormControl = new FormControl('#000000');
 
   constructor(
     private carsService: CarsServivce,
     private engineService: EngineService,
+    private winnersService: WinnersService,
     private dialog: MatDialog
   ) {}
 
@@ -159,6 +162,28 @@ export class GarageComponent implements OnInit, AfterContentInit {
   }
 
   removeCar(id: number) {
+    this.winnersService.getAllWinners().subscribe((res) => {
+      let winner = res.find((winner) => winner.id === id);
+      if (winner) {
+        this.winnersService
+          .deleteWinner(winner.id)
+          .subscribe((response) => console.log('response', response));
+      }
+    });
+
+    // ! { Remove Car From Winners - 2 way
+    // * I'll leave this code example here to show that
+    // * I can use another way to remove a car from the winners,
+    // * but then I may get a server error if the car is not in the winners list...
+    // this.winnersService.getWinner(id).subscribe((res) => {
+    //   this.winnersService.deleteWinner(id).subscribe((response) => {
+    //     console.log('car was deleted from winners list');
+    //   },(err) => {
+    //     console.log('this car not found in winners list');
+    //   });
+    // });
+    // ! }
+
     this.carsService.removeCar(id).subscribe((res) => {
       this.getCars(this.carsPerPage, this.currentPage);
       this.updatingCarsName.setValue('');
@@ -302,6 +327,35 @@ export class GarageComponent implements OnInit, AfterContentInit {
     fastestCars.forEach((car) => {
       winners.push(car);
     });
+    console.log('winners from getwinners', winners);
+
+    winners.map((winner) => {
+      this.winnersService.getWinner(winner.id).subscribe(
+        (res) => {
+          this.winnersService
+            .updateWinners(res.id, res.wins + 1, winner.velocity!)
+            .subscribe((res) => {
+              console.log('res from update car ', res);
+            });
+          console.log('rrresss', res);
+        },
+        (err) => {
+          console.log('here is an error');
+          console.log('winner body from animation', {
+            id: winner.id,
+            wins: 1,
+            time: winner.velocity!,
+          });
+
+          this.winnersService
+            .createWinner({ id: winner.id, wins: 1, time: winner.velocity! })
+            .subscribe((res) => {
+              console.log(res);
+            });
+        }
+      );
+    });
+
     setTimeout(() => {
       this.dialog.open(WinnersPopupComponent, {
         data: winners,

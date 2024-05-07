@@ -42,7 +42,8 @@ export class WinnersComponent implements OnInit {
       .getWinners(limit, page, sort, order)
       .subscribe((response: HttpResponse<IWinners[]>) => {
         console.log(response);
-
+        console.log('winners body',response.body);
+        
         this.winners = response.body ?? [];
         this.totalCount = +response.headers.get('X-Total-Count')!;
         // console.log('winners', this.winners);
