@@ -1,20 +1,129 @@
+@import url(https://fonts.googleapis.com/css?family=Kanit:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic);
+
 .container {
   display: flex;
   justify-content: space-around;
   align-items: center;
+  padding-top: 50px;
+  padding-bottom: 50px;
 
   .header__navigation-btns {
-    width: 20%;
+    width: 230px;
     display: flex;
     flex-direction: column;
     gap: 20px;
+    button {
+      width: 210px;
+      height: 40px;
+      background-color: transparent;
+      border: 3px solid;
+      border-radius: 7px;
+      font-family: "Kanit";
+      font-size: 19px;
+      line-height: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      transition: all 0.3s ease-in-out;
+      cursor: pointer;
+      &:hover {
+        opacity: 0.6;
+      }
+    }
   }
 
   .header__logo {
-    width: 20%;
+    width: 41%;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .header__logo-text {
+      width: 450px;
+      background-color: transparent;
+      color: #fff;
+      font-size: 40px;
+
+      .logo__line {
+        height: 40px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-family: "Kanit";
+        letter-spacing: 5px;
+        .first__line-text {
+          color: #8ec6cb;
+        }
+        .second__line-text {
+          color: #c691cd;
+        }
+        div {
+          height: 25px;
+        }
+      }
+
+      .symbols {
+        color: #fff;
+        text-transform: uppercase;
+        font-weight: 700;
+        font-family: "Kanit", sans-serif;
+      }
+
+      .symbols__first {
+        background: linear-gradient(
+          to left,
+          #57d75b 10%,
+          #25abe8 50%,
+          #095fab 60%
+        );
+        text-fill-color: transparent;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: firstTextClip 3s linear infinite;
+        background-size: auto auto;
+        background-clip: border-box;
+        background-size: 200% auto;
+        color: #fff;
+        background-clip: text;
+        display: inline-block;
+      }
+      .symbols__second {
+        background: linear-gradient(
+          to right,
+          #57d75b 10%,
+          #25abe8 50%,
+          #095fab 60%
+        );
+        text-fill-color: transparent;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: secondTextClip 3s linear infinite;
+        background-size: auto auto;
+        background-clip: border-box;
+        background-size: 200% auto;
+        color: #fff;
+        background-clip: text;
+        display: inline-block;
+      }
+    }
   }
 }
 
-img {
-  border-radius: 35px;
+@keyframes firstTextClip {
+  from {
+    background-position: 200% center;
+  }
+}
+
+@keyframes secondTextClip {
+  to {
+    background-position: 200% center;
+  }
+}
+
+.greenBtn {
+  color: #8ec6cb;
+}
+
+.redBtn {
+  color: #c691cd;
 }
