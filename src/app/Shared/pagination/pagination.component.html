@@ -3,13 +3,13 @@
     [disabled]="currentPage === 1"
     (click)="callParentOnPageChange(currentPage - 1)"
   >
-    <
+  <mat-icon>arrow_back</mat-icon>
   </button>
-  <p>Page {{ currentPage }}</p>
+  <p>Page #{{ currentPage }}</p>
   <button
     [disabled]="currentPage * carsPerPage >= totalCount"
     (click)="callParentOnPageChange(currentPage + 1)"
   >
-    >
+    <mat-icon>arrow_forward</mat-icon>
   </button>
 </div>

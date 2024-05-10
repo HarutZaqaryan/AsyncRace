@@ -17,11 +17,14 @@ import {
   Validators,
 } from '@angular/forms';
 import { EngineService } from '../../../Services/engine.service';
-import { catchError, combineLatest, of, switchMap } from 'rxjs';
+import { catchError, combineLatest, of } from 'rxjs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { WinnersPopupComponent } from '../../winners-popup/winners-popup.component';
 import { WinnersService } from '../../../Services/winners.service';
-import { IWinners } from '../../../Models/IWinners';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-garage',
@@ -32,6 +35,10 @@ import { IWinners } from '../../../Models/IWinners';
     FormsModule,
     ReactiveFormsModule,
     MatDialogModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
   ],
   templateUrl: './garage.component.html',
   styleUrl: './garage.component.scss',
@@ -39,7 +46,7 @@ import { IWinners } from '../../../Models/IWinners';
 export class GarageComponent implements OnInit, AfterContentInit {
   cars: ICars[] = [];
   carElements: ElementRef[] = [];
-  carsPerPage: number = 10;
+  carsPerPage: number = 7;
   currentPage: number = 1;
   totalCount: number = 0;
   selected: boolean = false;
@@ -232,7 +239,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
         let trackDistance = (60.55 / 100) * screenWidth;
         this.raceAnimation(
           'start',
-          Math.floor(trackDistance),
+          screenWidth <= 1280 ? Math.floor(trackDistance) : 775,
           this.workingCars
         );
       });

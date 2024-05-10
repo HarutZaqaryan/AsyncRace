@@ -1,10 +1,29 @@
+@import url(https://fonts.googleapis.com/css?family=Kanit:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic);
+
 .pagination {
-    width: 200px;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-  
-    p {
-      margin-top: 5px;
+  width: 200px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  font-family: "Kanit";
+
+  p {
+    margin-top: 5px;
+    font-size: 30px;
+  }
+
+  button {
+    background-color: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    &:disabled {
+      cursor: default;
+      opacity: 0.3;
+    }
+    mat-icon {
+      font-size: 24px;
+      font-weight: 700;
     }
   }
+}

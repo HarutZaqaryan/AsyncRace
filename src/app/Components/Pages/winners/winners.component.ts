@@ -7,11 +7,12 @@ import { HttpResponse } from '@angular/common/http';
 import { IWinnerDetails } from '../../../Models/IWinnerDetails';
 import { combineLatest } from 'rxjs';
 import { PaginationComponent } from '../../../Shared/pagination/pagination.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-winners',
   standalone: true,
-  imports: [MatTableModule, PaginationComponent],
+  imports: [MatTableModule,MatIconModule, PaginationComponent],
   templateUrl: './winners.component.html',
   styleUrl: './winners.component.scss',
 })

@@ -4,9 +4,13 @@
   <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
     <!-- Id Column -->
     <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef>
-        No. <button (click)="sort('id','acs')">A</button
-        ><button (click)="sort('id','DESC')">D</button>
+      <th mat-header-cell *matHeaderCellDef class="sortableTH">
+        No.
+        <button (click)="sort('id', 'acs')" class="btn">
+          <mat-icon>arrow_downward</mat-icon></button
+        ><button (click)="sort('id', 'DESC')" class="btn">
+          <mat-icon>arrow_upward</mat-icon>
+        </button>
       </th>
       <td mat-cell *matCellDef="let element">{{ element.id }}.</td>
     </ng-container>
@@ -90,9 +94,13 @@
 
     <!-- Wins Column -->
     <ng-container matColumnDef="wins">
-      <th mat-header-cell *matHeaderCellDef>
-        Wins <button (click)="sort('wins','ASC')">A</button
-        ><button (click)="sort('wins','DESC')">D</button>
+      <th mat-header-cell *matHeaderCellDef >
+        Wins
+        <button (click)="sort('wins', 'ASC')" class="btn">
+          <mat-icon>arrow_downward</mat-icon></button
+        ><button (click)="sort('wins', 'DESC')" class="btn">
+          <mat-icon>arrow_upward</mat-icon>
+        </button>
       </th>
       <td mat-cell *matCellDef="let element">{{ element.wins }}</td>
     </ng-container>
@@ -100,8 +108,12 @@
     <!-- Best Time Column -->
     <ng-container matColumnDef="bestTime">
       <th mat-header-cell *matHeaderCellDef>
-        Best Time <button (click)="sort('time','ASC')">A</button
-        ><button (click)="sort('time','DESC')">D</button>
+        Best Time
+        <button (click)="sort('time', 'ASC')" class="btn">
+          <mat-icon>arrow_downward</mat-icon></button
+        ><button (click)="sort('time', 'DESC')" class="btn">
+          <mat-icon>arrow_upward</mat-icon>
+        </button>
       </th>
       <td mat-cell *matCellDef="let element">{{ element.time }}ms</td>
     </ng-container>

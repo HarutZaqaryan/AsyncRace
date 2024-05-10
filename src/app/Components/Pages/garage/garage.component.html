@@ -1,55 +1,100 @@
 <div class="garage__actions">
   <div class="race__actions">
-    <button (click)="overallRaceAdminister('start')" [disabled]="disableRaceButton">Race</button>
+    <button
+      (click)="overallRaceAdminister('start')"
+      [disabled]="disableRaceButton"
+      class="btn race-btn"
+    >
+      Race
+      <mat-icon>play_arrow</mat-icon>
+    </button>
     <!-- ToDo // Race Loading -->
-    <button (click)="overallRaceAdminister('reset')" [disabled]="disableResetButton">Reset</button>
+    <button
+      (click)="overallRaceAdminister('reset')"
+      [disabled]="disableResetButton"
+      class="btn reset-btn"
+    >
+      Reset
+      <mat-icon>replay</mat-icon>
+    </button>
   </div>
 
   <div class="create-update__actions">
-    <div class="c_a-input">
-      <input type="text" placeholder="Name" [formControl]="creatingCarsName" />
-      <input
-        type="Color"
-        placeholder="Color"
-        [formControl]="creatingCarsColor"
-      />
-      <button (click)="createCar()">Create</button>
+    <div class="c_u-input">
+      <!-- <input type="text" placeholder="Name" [formControl]="creatingCarsName" class="nameInput"/> -->
+      <mat-form-field class="example-full-width">
+        <mat-label>Car Name</mat-label>
+        <input [formControl]="creatingCarsName" matInput />
+      </mat-form-field>
+
+      <div class="color-create_btn">
+        <input
+          type="Color"
+          placeholder="Color"
+          [formControl]="creatingCarsColor"
+        />
+        <button mat-flat-button>Create</button>
+      </div>
     </div>
 
-    <div class="c_a-input">
-      <input type="text" placeholder="Name" [formControl]="updatingCarsName" />
-      <input
-        type="Color"
-        placeholder="Color"
-        [formControl]="updatingCarsColor"
-      />
-      <button [disabled]="!selected" (click)="updateCar()">Update</button>
+    <div class="c_u-input">
+      <mat-form-field class="example-full-width">
+        <mat-label>Car Name</mat-label>
+        <input [formControl]="updatingCarsName" matInput />
+      </mat-form-field>
+      <div class="color-create_btn">
+        <input
+          type="Color"
+          placeholder="Color"
+          [formControl]="updatingCarsColor"
+        />
+        <button mat-flat-button [disabled]="!selected" (click)="updateCar()">
+          Update
+        </button>
+      </div>
     </div>
   </div>
 
   <div class="generate__actions">
-    <button (click)="generateCarsAutomaticly()">Generate Car</button>
+    <button (click)="generateCarsAutomaticly()" class="generate-btn">
+      Generate Cars
+    </button>
   </div>
 </div>
 
+<div class="arrows arrows-top">> > > > > > > > > > > > > > > > > > > > > ></div>
 <div class="garage__container">
   <div class="garage__racing-track">
     @for (car of cars; track car) {
     <div class="racing__line">
       <div class="line__actions">
         <div class="car__actions">
-          <button (click)="selectCar(car.id)">Select</button>
-          <button (click)="removeCar(car.id)">Remove</button>
+          <button mat-flat-button (click)="selectCar(car.id)">Select</button>
+          <button mat-flat-button (click)="removeCar(car.id)">Remove</button>
         </div>
 
         <div class="engine__actions">
-          <button (click)="individualCarAnimation(individualCarElement,car,'started')">S</button>
+          <button
+            class="btn green-btn"
+            (click)="
+              individualCarAnimation(individualCarElement, car, 'started')
+            "
+          >
+            <mat-icon>play_arrow</mat-icon>
+          </button>
           <!-- ToDo // Engine Info -->
-          <button (click)="individualCarAnimation(individualCarElement,car,'stopped')">R</button>
+          <button
+            class="btn red-btn"
+            (click)="
+              individualCarAnimation(individualCarElement, car, 'stopped')
+            "
+          >
+            <mat-icon>replay</mat-icon>
+          </button>
         </div>
       </div>
 
-      <div class="car" #individualCarElement #animatingCars id={{car.id}}>
+      <div class="car" #individualCarElement #animatingCars id="{{ car.id }}">
         <svg
           width="100px"
           height="100px"
@@ -125,9 +170,12 @@
     }
   </div>
 </div>
+<div class="arrows arrows-bottom">
+  < < < < < < < < < < < < < < < < < < < < < <
+</div>
 
 <div class="garage__footer">
-  <p>Garage({{ totalCount }})</p>
+  <p class="garage-quantity">Garage - {{ totalCount }}</p>
   <app-pagination
     [carsPerPage]="carsPerPage"
     [currentPage]="currentPage"
