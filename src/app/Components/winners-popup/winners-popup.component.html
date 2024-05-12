@@ -1,10 +1,15 @@
 <div class="winners__container">
-  <h1>Winners`</h1>
+  <h1>{{ "Winners" | uppercase }}</h1>
   <hr />
 
   <div class="winners">
-    @for (winner of data; track winner) {
-    <p>{{ winner.name }} - {{ winner.velocity }}ms</p>
-    }
+    <ul>
+      @for (winner of data; track winner) {
+      <li>
+        <span class="winner-name">{{ winner.name }}</span> -
+        <span class="winner-velocity">{{ winner.velocity }}ms</span>
+      </li>
+      }
+    </ul>
   </div>
 </div>

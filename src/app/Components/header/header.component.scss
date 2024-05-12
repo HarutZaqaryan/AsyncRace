@@ -1,16 +1,18 @@
 @import url(https://fonts.googleapis.com/css?family=Kanit:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic);
 
 .container {
-  width: 1250px;
+  width: 700px;
   margin: 0 auto;
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
+  row-gap: 30px;
+  justify-content: center;
   align-items: center;
-  padding-top: 50px;
+  padding-top: 20px;
   padding-bottom: 50px;
 
   .header__navigation-btns {
-    width: 230px;
+    width: 226px;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -34,11 +36,12 @@
   }
 
   .header__logo {
-    width: 41%;
+    width: 400px;
     height: 120px;
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-left: 5px;
     .header__logo-text {
       width: 450px;
       background-color: transparent;

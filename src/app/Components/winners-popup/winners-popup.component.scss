@@ -1,5 +1,88 @@
+@import url(https://fonts.googleapis.com/css?family=Kanit:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic);
+
 .winners__container {
-    width: 300px;
-    height: 200px;
-    background-color: rgba(25, 25, 155, 0.514);
+  min-width: 255px;
+  max-width: 350px;
+  min-height: 200px;
+  background-color: #111c52;
+  color: #fff;
+  font-family: "Kanit";
+  border: 2px solid #fff;
+  border-radius: 10px;
+
+  h1 {
+    text-align: center;
+    font-size: 30px;
+    letter-spacing: 5px;
+    margin-top: 10px;
+  }
+
+  .winners {
+    ul {
+      width: 85%;
+      li {
+        margin-right: 14px;
+        font-size: 22px;
+        margin-bottom: 20px;
+
+        .winner-name {
+          font-weight: 700;
+        }
+
+        .winner-velocity {
+          font-weight: 400;
+          font-style: italic;
+          border-bottom: 0.5px dotted #fff;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 650px) {
+  .winners__container {
+    max-width: 295px;
+
+    h1 {
+      font-size: 23px;
+      letter-spacing: 3px;
+    }
+
+    .winners {
+      ul {
+        li {
+          font-size: 17px;
+          margin-bottom: 15px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .winners__container {
+    max-width: 150px;
+
+    h1 {
+      font-size: 20px;
+      letter-spacing: 2px;
+    }
+
+    .winners {
+      ul {
+        width: 60%;
+        li {
+          margin-right: 3px;
+          font-size: 13px;
+          margin-bottom: 12px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 325px) {
+  .winners__container {
+    min-width: 190px;
+  }
 }

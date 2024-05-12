@@ -1,6 +1,10 @@
 @import url(https://fonts.googleapis.com/css?family=Kanit:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic);
-@import url(https://fonts.googleapis.com/css?family=Raleway+Dots:regular);
 @import url(https://fonts.googleapis.com/css?family=Codystar:300,regular);
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
 
 .btn {
   text-align: center;
@@ -21,7 +25,7 @@
   }
   &:disabled {
     cursor: default;
-    opacity: 0.6;
+    opacity: 0.3;
   }
 }
 
@@ -38,14 +42,6 @@
   span {
     color: #a57680;
   }
-}
-
-.arrows-top {
-  margin-bottom: -26px;
-}
-
-.arrows-bottom {
-  margin-top: -1px;
 }
 
 .garage__container {
@@ -76,10 +72,12 @@
     }
 
     .race-btn {
+      border-radius: 10px;
       color: #8ec6cb;
     }
 
     .reset-btn {
+      border-radius: 10px;
       color: #c691cd;
     }
   }
@@ -130,6 +128,7 @@
 }
 
 .generate-btn {
+  border-radius: 10px !important;
   width: 80px;
   color: #8ec6cb;
   height: 48px;
@@ -146,6 +145,14 @@
   &:hover {
     opacity: 0.6;
   }
+}
+
+.arrows-top {
+  margin-bottom: -26px;
+}
+
+.arrows-bottom {
+  margin-top: -1px;
 }
 
 .racing__line {
@@ -225,14 +232,29 @@
     font-size: 30px;
     letter-spacing: 10px;
     font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+  }
+
+  .stopped-sign {
+    width: 20px;
+    height: 20px;
+    border: 1px solid red;
+    border-radius: 50%;
+    background-color: red;
+    margin-left: -47px;
+    cursor: pointer;
   }
 
   .start {
     color: #a57680;
     margin-top: 8px;
+    margin-left: -15px;
   }
   .finish {
     margin-top: 14px;
+    margin-right: -20px;
     color: #8ec6cb;
   }
 }
@@ -261,4 +283,199 @@
   height: 30px;
   background-color: red;
   border-radius: 50%;
+}
+
+// * Responsive Design
+
+@media (max-width: 1090px) {
+  .garage__actions {
+    .create-update__actions {
+      gap: unset;
+    }
+  }
+
+  .example-full-width {
+    width: 58%;
+  }
+
+  .btn {
+    width: 90px;
+  }
+
+  .c_u-input {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 1010px) {
+  .container {
+    width: 900px;
+  }
+
+  .track {
+    width: 575px;
+    .stopped-sign {
+      margin-left: 0px;
+    }
+  }
+
+  .arrows {
+    font-size: 42px;
+  }
+}
+
+@media (max-width: 990px) {
+  .track {
+    width: 580px;
+  }
+}
+
+@media (max-width: 899px) {
+  .container {
+    width: 800px;
+  }
+
+  .track {
+    width: 475px;
+  }
+
+  .garage__actions {
+    .race__actions {
+      flex-direction: column;
+      gap: 2px;
+    }
+    .create-update__actions {
+      .c_u-input {
+        .color-create_btn {
+          width: 50px;
+          input,
+          button {
+            height: 23px;
+          }
+          button {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+
+  .race-btn,
+  .reset-btn {
+    height: 24px;
+    font-size: 15px;
+    font-weight: 400;
+    border: 2px solid;
+  }
+
+  .example-full-width {
+    width: 55%;
+  }
+
+  .arrows {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 780px) {
+  .container {
+    width: 700px;
+  }
+
+  .garage__actions {
+    width: 699px;
+
+    .create-update__actions {
+      width: 72%;
+      .c_u-input {
+        .color-create_btn {
+          width: 50px;
+          input,
+          button {
+            height: 21px;
+          }
+          button {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+
+    .generate-btn {
+      width: 65px;
+      font-size: 11px;
+      border: 2px solid;
+    }
+  }
+
+  .line__actions {
+    width: 102px;
+    .car__actions {
+      button {
+        width: 60px;
+        margin-left: 0;
+        font-size: 12px;
+      }
+    }
+    .engine__actions {
+      button {
+        width: 37px;
+        mat-icon {
+          margin-top: 4px;
+          font-size: 19px;
+        }
+      }
+    }
+  }
+
+  .car {
+    svg {
+      width: 85px;
+    }
+  }
+
+  .track {
+    width: 435px;
+    .car-name {
+      font-size: 22px;
+      letter-spacing: 8px;
+    }
+  }
+
+  .arrows {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 500px) {
+  .container {
+    width: 670px;
+    margin-left: 15px;
+  }
+
+  .garage__actions {
+    width: 665px;
+  }
+
+  .example-full-width {
+    width: 53%;
+  }
+
+  .btn {
+    width: 80px;
+  }
+
+  .car {
+    svg {
+      width: 83px;
+    }
+  }
+
+  .track {
+    width: 405px;
+  }
+
+  .arrows {
+    font-size: 28px;
+  }
 }

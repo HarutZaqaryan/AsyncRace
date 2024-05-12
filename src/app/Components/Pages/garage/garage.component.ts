@@ -52,6 +52,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
   selected: boolean = false;
   updatingCarsId: number = 0;
   animationAction: string = 'stop';
+  animationStart:boolean = false;
   disableRaceButton: boolean = false;
   disableResetButton: boolean = true;
   @ViewChildren('animatingCars') animatingCars!: QueryList<ElementRef>;
@@ -120,6 +121,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
           .subscribe((res) => {
             this.getCars(this.carsPerPage, this.currentPage);
             this.creatingCarsName.setValue('');
+            this.creatingCarsName.reset();
             this.creatingCarsColor.setValue('#000000');
           });
       } else {
@@ -159,6 +161,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
           .subscribe((res) => {
             this.getCars(this.carsPerPage, this.currentPage);
             this.updatingCarsName.setValue('');
+            this.updatingCarsName.reset();
             this.updatingCarsColor.setValue('#000000');
           });
       } else {
@@ -221,6 +224,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
         return this.engineService.engineMode(car.id, 'drive').pipe(
           catchError((err) => {
             this.start_stopEngine(car.id, 'stopped');
+            car.success = false
             return of(err);
           })
         );
@@ -232,14 +236,31 @@ export class GarageComponent implements OnInit, AfterContentInit {
             let workingCar = this.cars.find(
               (car) => car.id == +splitedUrl[1].split('&')[0]
             );
+            workingCar!.success = true;
             this.workingCars.push(workingCar!);
           }
         });
         let screenWidth = window.screen.width;
-        let trackDistance = (60.55 / 100) * screenWidth;
+        // let trackDistance = (60.55 / 100) * screenWidth;
+        let trackDistance = 775;
+
+        if(screenWidth <= 1010) {
+          trackDistance = 675;
+        }
+        if (screenWidth <= 900) {
+          trackDistance = 570;
+        }
+        if (screenWidth <= 780) {
+          trackDistance = 515;
+        }
+        if (screenWidth <= 500) {
+          trackDistance = 485;
+        }
+
         this.raceAnimation(
           'start',
-          screenWidth <= 1280 ? Math.floor(trackDistance) : 775,
+          // screenWidth <= 970 ? Math.floor(trackDistance) : 775,
+          trackDistance,
           this.workingCars
         );
       });
@@ -248,6 +269,9 @@ export class GarageComponent implements OnInit, AfterContentInit {
         this.start_stopEngine(car.id, 'stopped');
       });
       this.raceAnimation('stop');
+      this.animationStart = false;
+      console.log('animation start',this.animationStart);
+      
     }
   }
 
@@ -258,6 +282,18 @@ export class GarageComponent implements OnInit, AfterContentInit {
   ) {
     let screenWidth = window.screen.width;
     let trackDistance = (60.55 / 100) * screenWidth;
+    if(screenWidth <= 1010) {
+      trackDistance = 675;
+    }
+    if (screenWidth <= 900) {
+      trackDistance = 570;
+    }
+    if (screenWidth <= 780) {
+      trackDistance = 515;
+    }
+    if (screenWidth <= 500) {
+      trackDistance = 485;
+    }
     if (status === 'started') {
       this.start_stopEngine(car.id, 'started');
       this.engineService.engineMode(car.id, 'drive').subscribe(
@@ -277,6 +313,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
   }
 
   raceAnimation(action: string, trackDistance?: number, workingCars?: ICars[]) {
+    this.animationStart = true;
     this.carElements = [];
     this.animatingCars.forEach((carElem: ElementRef) => {
       this.carElements.push(carElem);
