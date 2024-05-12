@@ -33,7 +33,9 @@
             placeholder="Color"
             [formControl]="creatingCarsColor"
           />
-          <button mat-flat-button (click)="createCar()" class="c_u-btn">Create</button>
+          <button mat-flat-button (click)="createCar()" class="c_u-btn">
+            Create
+          </button>
         </div>
       </div>
 
@@ -48,7 +50,12 @@
             placeholder="Color"
             [formControl]="updatingCarsColor"
           />
-          <button mat-flat-button [disabled]="!selected" (click)="updateCar()" class="c_u-btn">
+          <button
+            mat-flat-button
+            [disabled]="!selected"
+            (click)="updateCar()"
+            class="c_u-btn"
+          >
             Update
           </button>
         </div>
@@ -72,7 +79,7 @@
         <div class="line__actions">
           <div class="car__actions">
             <button mat-flat-button (click)="selectCar(car.id)">Select</button>
-            <button mat-flat-button (click)="removeCar(car.id)">Remove</button>
+            <button mat-flat-button (click)="removeCar(car)">Remove</button>
           </div>
 
           <div class="engine__actions">

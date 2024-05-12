@@ -25,6 +25,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-garage',
@@ -39,6 +40,7 @@ import { MatButtonModule } from '@angular/material/button';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatSnackBarModule,
   ],
   templateUrl: './garage.component.html',
   styleUrl: './garage.component.scss',
@@ -50,9 +52,10 @@ export class GarageComponent implements OnInit, AfterContentInit {
   currentPage: number = 1;
   totalCount: number = 0;
   selected: boolean = false;
+  selectedCarName: string = '';
   updatingCarsId: number = 0;
   animationAction: string = 'stop';
-  animationStart:boolean = false;
+  animationStart: boolean = false;
   disableRaceButton: boolean = false;
   disableResetButton: boolean = true;
   @ViewChildren('animatingCars') animatingCars!: QueryList<ElementRef>;
@@ -73,7 +76,8 @@ export class GarageComponent implements OnInit, AfterContentInit {
     private carsService: CarsServivce,
     private engineService: EngineService,
     private winnersService: WinnersService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private _snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -119,6 +123,11 @@ export class GarageComponent implements OnInit, AfterContentInit {
         this.carsService
           .createCar(this.creatingCarsName.value, this.creatingCarsColor.value)
           .subscribe((res) => {
+            this.openSnackBar(
+              `A new car has joined the race -  "${this.titleCase(
+                this.creatingCarsName.value
+              )}" !`
+            );
             this.getCars(this.carsPerPage, this.currentPage);
             this.creatingCarsName.setValue('');
             this.creatingCarsName.reset();
@@ -134,13 +143,14 @@ export class GarageComponent implements OnInit, AfterContentInit {
   selectCar(id: number) {
     this.selected = true;
     let selectedCar = this.cars.find((car) => car.id === id);
+    this.selectedCarName = selectedCar!.name;
     this.updatingCarsId = selectedCar!.id;
     this.updatingCarsName.setValue(selectedCar!.name);
     this.updatingCarsColor.setValue(selectedCar!.color);
   }
 
   updateCar() {
-    let updatingCar = this.cars.find(
+    let existingCar = this.cars.find(
       (car) =>
         car.name.toLocaleLowerCase() ===
         this.updatingCarsName.value.toLocaleLowerCase()
@@ -148,9 +158,9 @@ export class GarageComponent implements OnInit, AfterContentInit {
 
     if (this.updatingCarsName.status === 'VALID') {
       if (
-        !updatingCar ||
+        !existingCar ||
         this.updatingCarsName.value.toLocaleLowerCase() !==
-          updatingCar.name.toLocaleLowerCase()
+          existingCar.name.toLocaleLowerCase()
       ) {
         this.carsService
           .updateCar(
@@ -159,6 +169,13 @@ export class GarageComponent implements OnInit, AfterContentInit {
             this.updatingCarsColor.value
           )
           .subscribe((res) => {
+            this.openSnackBar(
+              `"${this.titleCase(
+                this.selectedCarName
+              )}" changed its name, now it performs under the name - "${this.titleCase(
+                this.updatingCarsName.value
+              )}"`
+            );
             this.getCars(this.carsPerPage, this.currentPage);
             this.updatingCarsName.setValue('');
             this.updatingCarsName.reset();
@@ -171,9 +188,9 @@ export class GarageComponent implements OnInit, AfterContentInit {
     }
   }
 
-  removeCar(id: number) {
+  removeCar(car: ICars) {
     this.winnersService.getAllWinners().subscribe((res) => {
-      let winner = res.find((winner) => winner.id === id);
+      let winner = res.find((winner) => winner.id === car.id);
       if (winner) {
         this.winnersService
           .deleteWinner(winner.id)
@@ -194,10 +211,11 @@ export class GarageComponent implements OnInit, AfterContentInit {
     // });
     // ! }
 
-    this.carsService.removeCar(id).subscribe((res) => {
+    this.carsService.removeCar(car.id).subscribe((res) => {
       this.getCars(this.carsPerPage, this.currentPage);
       this.updatingCarsName.setValue('');
       this.updatingCarsColor.setValue('#000000');
+      this.openSnackBar(`"${this.titleCase(car.name)}" left the race !`);
 
       if (this.cars.length === 1 && this.currentPage > 1) {
         this.currentPage -= 1;
@@ -224,7 +242,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
         return this.engineService.engineMode(car.id, 'drive').pipe(
           catchError((err) => {
             this.start_stopEngine(car.id, 'stopped');
-            car.success = false
+            car.success = false;
             return of(err);
           })
         );
@@ -244,7 +262,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
         // let trackDistance = (60.55 / 100) * screenWidth;
         let trackDistance = 775;
 
-        if(screenWidth <= 1010) {
+        if (screenWidth <= 1010) {
           trackDistance = 675;
         }
         if (screenWidth <= 900) {
@@ -270,8 +288,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
       });
       this.raceAnimation('stop');
       this.animationStart = false;
-      console.log('animation start',this.animationStart);
-      
+      console.log('animation start', this.animationStart);
     }
   }
 
@@ -282,7 +299,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
   ) {
     let screenWidth = window.screen.width;
     let trackDistance = (60.55 / 100) * screenWidth;
-    if(screenWidth <= 1010) {
+    if (screenWidth <= 1010) {
       trackDistance = 675;
     }
     if (screenWidth <= 900) {
@@ -405,6 +422,18 @@ export class GarageComponent implements OnInit, AfterContentInit {
         data: winners,
       });
     }, winners[0].velocity! * 2 * 10);
+  }
+
+  titleCase(str: string) {
+    return str.toLowerCase().replace(/\b\w/g, function (char) {
+      return char.toUpperCase();
+    });
+  }
+
+  openSnackBar(message: string) {
+    this._snackBar.open(message, undefined, {
+      duration: 3000,
+    });
   }
 
   onPageChange(page: number): void {
