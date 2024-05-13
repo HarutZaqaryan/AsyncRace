@@ -10,7 +10,6 @@
         <span> Race </span>
         <mat-icon>play_arrow</mat-icon>
       </button>
-      <!-- ToDo // Race Loading -->
       <button
         (click)="overallRaceAdminister('reset')"
         [disabled]="disableResetButton"
@@ -23,10 +22,23 @@
 
     <div class="create-update__actions">
       <div class="c_u-input">
-        <mat-form-field class="example-full-width">
-          <mat-label>Car Name</mat-label>
-          <input [formControl]="creatingCarsName" matInput />
-        </mat-form-field>
+        <div class="create-input">
+          <mat-form-field class="example-full-width">
+            <mat-label>Car Name</mat-label>
+            <input [formControl]="creatingCarsName" matInput #createInput />
+            <button
+              matSuffix
+              mat-icon-button
+              aria-label="Clear"
+              (click)="resetInput('create')"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+          @if(creatingCarsNameError) {
+          <mat-error>{{ creatingCarsNameError }}</mat-error>
+          }
+        </div>
 
         <div class="color-create_btn">
           <input
@@ -41,22 +53,30 @@
       </div>
 
       <div class="c_u-input">
-        <mat-form-field class="example-full-width">
-          <mat-label>Car Name</mat-label>
-          <input [formControl]="updatingCarsName" matInput />
-        </mat-form-field>
+        <div class="update-input">
+          <mat-form-field class="example-full-width">
+            <mat-label>Car Name</mat-label>
+            <input [formControl]="updatingCarsName" matInput #updateInput />
+            <button
+              matSuffix
+              mat-icon-button
+              aria-label="Clear"
+              (click)="resetInput('update')"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+          @if(updatingCarsNameError) {
+          <mat-error>{{ updatingCarsNameError }}</mat-error>
+          }
+        </div>
         <div class="color-create_btn">
           <input
             type="Color"
             placeholder="Color"
             [formControl]="updatingCarsColor"
           />
-          <button
-            mat-flat-button
-            [disabled]="!selected"
-            (click)="updateCar()"
-            class="c_u-btn"
-          >
+          <button mat-flat-button (click)="updateCar()" class="c_u-btn">
             Update
           </button>
         </div>
@@ -80,14 +100,15 @@
 
   <div class="garage__container">
     <div class="garage__racing-track">
-      
       @if(dataLoading && cars.length == 0) {
       <div class="loading-spinner">
         <app-loading-spinner></app-loading-spinner>
       </div>
-      } 
-      
-      @for (car of cars; track car) {
+      } @if(cars.length === 0 && !dataLoading) {
+      <div class="no-data">
+        <p>Sorry, dear fan, but not a single car came to the race today.</p>
+      </div>
+      } @for (car of cars; track car) {
       <div class="racing__line">
         <div class="line__actions">
           <div class="car__actions">
@@ -101,6 +122,10 @@
               (click)="
                 individualCarAnimation(individualCarElement, car, 'started')
               "
+              [disabled]="disableIndividualRaceButton || car.started"
+              [ngClass]="{
+                loadingBtn: individualAnimationStart && car.started
+              }"
             >
               <mat-icon>play_arrow</mat-icon>
             </button>
@@ -110,6 +135,7 @@
               (click)="
                 individualCarAnimation(individualCarElement, car, 'stopped')
               "
+              [disabled]="disableIndividualResetButton || !car.started"
             >
               <mat-icon>replay</mat-icon>
             </button>
@@ -186,7 +212,7 @@
         <div class="track">
           <p class="start">Start</p>
           <h3 class="car-name">
-            @if (animationStart && !car.success) {
+            @if (animationStart && (car.success === false)) {
             <div
               class="stopped-sign"
               title="Something is wrong with this cars engine"

@@ -4,5 +4,6 @@ export interface ICars {
   id: number;
   velocity?:number;
   distance?:number;
+  started?:boolean;
   success?:boolean
 }

@@ -1,9 +1,12 @@
 import {
   AfterContentInit,
+  AfterViewInit,
   Component,
   ElementRef,
   OnInit,
   QueryList,
+  Renderer2,
+  ViewChild,
   ViewChildren,
 } from '@angular/core';
 import { CarsServivce } from '../../../Services/cars.service';
@@ -49,7 +52,9 @@ import { LoadingSpinnerComponent } from '../../../Shared/loading-spinner/loading
   templateUrl: './garage.component.html',
   styleUrl: './garage.component.scss',
 })
-export class GarageComponent implements OnInit, AfterContentInit {
+export class GarageComponent
+  implements OnInit, AfterViewInit, AfterContentInit
+{
   cars: ICars[] = [];
   carElements: ElementRef[] = [];
   carsPerPage: number = 7;
@@ -58,20 +63,31 @@ export class GarageComponent implements OnInit, AfterContentInit {
   selected: boolean = false;
   selectedCarName: string = '';
   updatingCarsId: number = 0;
-  animationAction: string = 'stop';
-  animationStart: boolean = false;
+
   dataLoading: boolean = true;
   raceLoading: boolean = false;
   generateLoading: boolean = false;
+
+  animationAction: string = 'stop';
+  animationStart: boolean = false;
+  individualAnimationStart: boolean = false;
+
   disableRaceButton: boolean = false;
   disableResetButton: boolean = true;
+  disableIndividualRaceButton = false;
+  disableIndividualResetButton = true;
+
   @ViewChildren('animatingCars') animatingCars!: QueryList<ElementRef>;
   workingCars: ICars[] = [];
 
+  @ViewChild('createInput') createInput!: ElementRef;
+  creatingCarsNameError: string = '';
   creatingCarsName: FormControl = new FormControl('', [
     Validators.required,
     Validators.minLength(2),
   ]);
+  @ViewChild('updateInput') updateInput!: ElementRef;
+  updatingCarsNameError: string = '';
   updatingCarsName: FormControl = new FormControl('', [
     Validators.required,
     Validators.minLength(2),
@@ -84,11 +100,25 @@ export class GarageComponent implements OnInit, AfterContentInit {
     private engineService: EngineService,
     private winnersService: WinnersService,
     private dialog: MatDialog,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private renderer: Renderer2
   ) {}
 
   ngOnInit(): void {
     this.getCars(this.carsPerPage, this.currentPage);
+  }
+
+  ngAfterViewInit() {
+    this.renderer.listen(
+      this.createInput.nativeElement,
+      'blur',
+      this.onCreateInputBlur.bind(this)
+    );
+    this.renderer.listen(
+      this.updateInput.nativeElement,
+      'blur',
+      this.onUpdateInputBlur.bind(this)
+    );
   }
 
   ngAfterContentInit(): void {
@@ -118,34 +148,47 @@ export class GarageComponent implements OnInit, AfterContentInit {
   }
 
   createCar() {
-    let existingCar = this.cars.find(
-      (car) =>
-        car.name.toLocaleLowerCase() ===
-        this.creatingCarsName.value.toLocaleLowerCase()
-    );
-
-    if (this.creatingCarsName.status === 'VALID') {
-      if (
-        !existingCar ||
-        this.creatingCarsName.value.toLocaleLowerCase() !==
-          existingCar!.name.toLocaleLowerCase()
-      ) {
-        this.carsService
-          .createCar(this.creatingCarsName.value, this.creatingCarsColor.value)
-          .subscribe((res) => {
-            this.openSnackBar(
-              `A new car has joined the race -  "${this.titleCase(
-                this.creatingCarsName.value
-              )}" !`
-            );
-            this.getCars(this.carsPerPage, this.currentPage);
-            this.creatingCarsName.setValue('');
-            this.creatingCarsName.reset();
-            this.creatingCarsColor.setValue('#000000');
-          });
+    if (this.creatingCarsName.value !== '' && this.creatingCarsName.untouched) {
+      let existingCar = this.cars.find(
+        (car) =>
+          car.name.toLocaleLowerCase() ===
+          this.creatingCarsName.value.toLocaleLowerCase()
+      );
+      if (this.creatingCarsName.status === 'VALID') {
+        if (
+          !existingCar ||
+          this.creatingCarsName.value.toLocaleLowerCase() !==
+            existingCar!.name.toLocaleLowerCase()
+        ) {
+          this.carsService
+            .createCar(
+              this.creatingCarsName.value,
+              this.creatingCarsColor.value
+            )
+            .subscribe((res) => {
+              this.openSnackBar(
+                `"${this.titleCase(
+                  this.creatingCarsName.value
+                )}" has joined the race!`
+              );
+              this.getCars(this.carsPerPage, this.currentPage);
+              this.creatingCarsName.setValue('');
+              this.creatingCarsName.reset();
+              this.creatingCarsColor.setValue('#000000');
+            });
+        } else {
+          this.creatingCarsNameError = `Car with name "${existingCar.name}" already exists`;
+        }
       } else {
-        // ToDo // Input Errors
-        console.log('car already exist');
+        if (this.creatingCarsName.hasError('minlength')) {
+          this.creatingCarsNameError =
+            'This field must contain minimum 2 letters';
+        }
+      }
+    } else {
+      this.creatingCarsNameError = 'This field is required';
+      if (this.creatingCarsName.hasError('required')) {
+        this.creatingCarsNameError = 'This field is required';
       }
     }
   }
@@ -160,42 +203,77 @@ export class GarageComponent implements OnInit, AfterContentInit {
   }
 
   updateCar() {
-    let existingCar = this.cars.find(
-      (car) =>
-        car.name.toLocaleLowerCase() ===
-        this.updatingCarsName.value.toLocaleLowerCase()
-    );
-
-    if (this.updatingCarsName.status === 'VALID') {
-      if (
-        !existingCar ||
-        this.updatingCarsName.value.toLocaleLowerCase() !==
-          existingCar.name.toLocaleLowerCase()
-      ) {
-        this.carsService
-          .updateCar(
-            this.updatingCarsId,
-            this.updatingCarsName.value,
-            this.updatingCarsColor.value
-          )
-          .subscribe((res) => {
-            this.openSnackBar(
-              `"${this.titleCase(
-                this.selectedCarName
-              )}" changed its name, now it performs under the name - "${this.titleCase(
-                this.updatingCarsName.value
-              )}"`
-            );
-            this.getCars(this.carsPerPage, this.currentPage);
-            this.updatingCarsName.setValue('');
-            this.updatingCarsName.reset();
-            this.updatingCarsColor.setValue('#000000');
-          });
+    if (this.updatingCarsName.value !== '' && this.updatingCarsName.untouched) {
+      let existingCar = this.cars.find(
+        (car) =>
+          car.name.toLocaleLowerCase() ===
+          this.updatingCarsName.value.toLocaleLowerCase()
+      );
+      if (this.updatingCarsName.status === 'VALID') {
+        if (
+          !existingCar ||
+          this.updatingCarsName.value.toLocaleLowerCase() !==
+            existingCar.name.toLocaleLowerCase()
+        ) {
+          this.carsService
+            .updateCar(
+              this.updatingCarsId,
+              this.updatingCarsName.value,
+              this.updatingCarsColor.value
+            )
+            .subscribe((res) => {
+              this.openSnackBar(
+                `"${this.titleCase(
+                  this.selectedCarName
+                )}" changed its name, now it performs under the name - "${this.titleCase(
+                  this.updatingCarsName.value
+                )}"`
+              );
+              this.getCars(this.carsPerPage, this.currentPage);
+              this.updatingCarsName.setValue('');
+              this.updatingCarsName.reset();
+              this.updatingCarsColor.setValue('#000000');
+            });
+        } else {
+          this.updatingCarsNameError = `Car with name "${existingCar.name}" already exists`;
+        }
       } else {
-        // ToDo // Input Errors
-        console.log('car with this name already exist');
+        if (this.updatingCarsName.hasError('minlength')) {
+          this.updatingCarsNameError =
+            'This field must contain minimum 2 letters';
+        }
+      }
+    } else {
+      this.updatingCarsNameError = 'This field is required';
+      if (this.updatingCarsName.hasError('required')) {
+        this.updatingCarsNameError = 'This field is required';
       }
     }
+  }
+
+  resetInput(formName: string) {
+    if (formName === 'create') {
+      this.creatingCarsName.reset();
+      this.creatingCarsName.setValue('');
+      this.creatingCarsName.markAsUntouched();
+      this.creatingCarsNameError = '';
+    }
+    if (formName === 'update') {
+      this.updatingCarsName.reset();
+      this.updatingCarsName.setValue('');
+      this.updatingCarsName.markAsUntouched();
+      this.updatingCarsNameError = '';
+    }
+  }
+
+  onCreateInputBlur() {
+    this.creatingCarsName!.markAsUntouched();
+    this.creatingCarsNameError = '';
+  }
+
+  onUpdateInputBlur() {
+    this.updatingCarsName!.markAsUntouched();
+    this.updatingCarsNameError = '';
   }
 
   removeCar(car: ICars) {
@@ -236,8 +314,9 @@ export class GarageComponent implements OnInit, AfterContentInit {
 
   start_stopEngine(id: number, status: string) {
     this.disableRaceButton = true;
+    let car = this.cars.find((car) => car.id === id);
     this.engineService.start_stopEngine(id, status).subscribe((res) => {
-      let car = this.cars.find((car) => car.id === id);
+      // let car = this.cars.find((car) => car.id === id);
       car!.velocity = res.velocity;
       car!.distance = res.distance;
       console.log('from start-stop', status, car!.name, '-', car!.velocity);
@@ -247,6 +326,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
   overallRaceAdminister(action: string) {
     this.workingCars = [];
     if (action === 'start') {
+      this.disableIndividualRaceButton = true;
       this.raceLoading = true;
       const requests = this.cars.map((car) => {
         this.start_stopEngine(car.id, 'started');
@@ -272,7 +352,6 @@ export class GarageComponent implements OnInit, AfterContentInit {
         let screenWidth = window.screen.width;
         // let trackDistance = (60.55 / 100) * screenWidth;
         let trackDistance = 775;
-
         if (screenWidth <= 1010) {
           trackDistance = 675;
         }
@@ -285,7 +364,6 @@ export class GarageComponent implements OnInit, AfterContentInit {
         if (screenWidth <= 500) {
           trackDistance = 485;
         }
-
         this.raceLoading = false;
         this.raceAnimation(
           'start',
@@ -297,10 +375,12 @@ export class GarageComponent implements OnInit, AfterContentInit {
     } else {
       this.cars.map((car) => {
         this.start_stopEngine(car.id, 'stopped');
+        car.started = false;
       });
       this.raceAnimation('stop');
       this.animationStart = false;
-      console.log('animation start', this.animationStart);
+      this.disableIndividualRaceButton = false;
+      this.disableIndividualResetButton = true;
     }
   }
 
@@ -309,6 +389,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
     car: ICars,
     status: string
   ) {
+    this.individualAnimationStart = true;
     let screenWidth = window.screen.width;
     let trackDistance = (60.55 / 100) * screenWidth;
     if (screenWidth <= 1010) {
@@ -325,16 +406,41 @@ export class GarageComponent implements OnInit, AfterContentInit {
     }
     if (status === 'started') {
       this.start_stopEngine(car.id, 'started');
+      car.started = true;
       this.engineService.engineMode(car.id, 'drive').subscribe(
         (res) => {
+          car.success = res.body?.success;
+          this.individualAnimationStart = false;
+          this.animationStart = true;
+          this.disableResetButton = false;
+          this.disableIndividualResetButton = false;
           carElement.style.transition = `${car.velocity}0ms ease-in`;
           carElement.style.transform = `translateX(${trackDistance}px)`;
         },
         (err) => {
+          car.success = false;
+          this.disableIndividualResetButton = false;
+          this.disableResetButton = false;
+          this.individualAnimationStart = false;
+          this.animationStart = true;
           this.start_stopEngine(car.id, 'stopped');
         }
       );
     } else {
+      car.started = false;
+      this.animationStart = false;
+      this.disableIndividualRaceButton = false;
+      this.disableIndividualResetButton = false;
+      this.individualAnimationStart = false;
+      console.log('disable race button', this.disableIndividualRaceButton);
+      console.log('cars', this.cars);
+      let allStopped = this.cars.every((car) => !car.started);
+      if (allStopped) {
+        setTimeout(() => {
+          this.disableRaceButton = false;
+        }, 0);
+        this.disableResetButton = true;
+      }
       this.start_stopEngine(car.id, 'stopped');
       carElement.style.transition = '1ms ease-in';
       carElement.style.transform = 'translateX(0px)';

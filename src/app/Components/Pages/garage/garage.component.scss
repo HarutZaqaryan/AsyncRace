@@ -106,6 +106,16 @@
     justify-content: center;
     align-items: center;
   }
+
+  .no-data {
+    color: #fff;
+    font-size: 18px;
+    width: 560px;
+    margin: 5% auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 .garage__actions {
@@ -148,8 +158,23 @@
       display: flex;
       gap: 10px;
 
+      .create-input,
+      .update-input {
+        width: 65%;
+        display: flex;
+        flex-direction: column;
+      }
+
       mat-form-field {
+        // width: 65%;
         height: 70px;
+      }
+
+      mat-error {
+        font-size: 11px;
+        margin-top: -20px;
+        margin-bottom: 15px;
+        text-align: center;
       }
 
       .color-create_btn {
@@ -180,7 +205,8 @@
 }
 
 .example-full-width {
-  width: 65%;
+  // width: 65%;
+  width: 100%;
 }
 
 .generate-btn {
@@ -350,10 +376,6 @@
     }
   }
 
-  .example-full-width {
-    width: 58%;
-  }
-
   .btn {
     width: 90px;
   }
@@ -424,10 +446,6 @@
     border: 2px solid;
   }
 
-  .example-full-width {
-    width: 55%;
-  }
-
   .arrows {
     font-size: 36px;
   }
@@ -445,7 +463,8 @@
       width: 72%;
       .c_u-input {
         .color-create_btn {
-          width: 50px;
+          // width: 50px;
+          width: 35px;
           input,
           button {
             height: 21px;
@@ -511,10 +530,13 @@
 
   .garage__actions {
     width: 665px;
-  }
-
-  .example-full-width {
-    width: 53%;
+    .create-update__actions {
+      .c_u-input {
+        .color-create_btn {
+          width: 25px;
+        }
+      }
+    }
   }
 
   .btn {
