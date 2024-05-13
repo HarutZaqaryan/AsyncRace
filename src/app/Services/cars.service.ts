@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ICars } from '../Models/ICars';
 import { Observable, forkJoin } from 'rxjs';
@@ -233,7 +233,9 @@ export class CarsServivce {
   getCars(limit: number, page: number) {
     return this.http.get<ICars[]>(
       `${this.carsUrl}?_limit=${limit}&&_page=${page}`,
-      { observe: 'response' }
+      {
+        observe: 'response',
+      }
     );
   }
 

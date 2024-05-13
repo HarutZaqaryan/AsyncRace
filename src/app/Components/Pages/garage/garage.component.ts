@@ -26,12 +26,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { CommonModule } from '@angular/common';
+import { LoadingSpinnerComponent } from '../../../Shared/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-garage',
   standalone: true,
   animations: [],
   imports: [
+    CommonModule,
     PaginationComponent,
     FormsModule,
     ReactiveFormsModule,
@@ -41,6 +44,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatInputModule,
     MatButtonModule,
     MatSnackBarModule,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './garage.component.html',
   styleUrl: './garage.component.scss',
@@ -56,6 +60,9 @@ export class GarageComponent implements OnInit, AfterContentInit {
   updatingCarsId: number = 0;
   animationAction: string = 'stop';
   animationStart: boolean = false;
+  dataLoading: boolean = true;
+  raceLoading: boolean = false;
+  generateLoading: boolean = false;
   disableRaceButton: boolean = false;
   disableResetButton: boolean = true;
   @ViewChildren('animatingCars') animatingCars!: QueryList<ElementRef>;
@@ -96,14 +103,17 @@ export class GarageComponent implements OnInit, AfterContentInit {
     this.carsService
       .getCars(limit, page)
       .subscribe((res: HttpResponse<ICars[]>) => {
+        this.dataLoading = false;
         this.cars = res.body ?? [];
         this.totalCount = +res.headers.get('X-Total-Count')!;
       });
   }
 
   generateCarsAutomaticly(): void {
+    this.generateLoading = true;
     this.carsService.generateCars().subscribe((res) => {
       this.getCars(this.carsPerPage, this.currentPage);
+      this.generateLoading = false;
     });
   }
 
@@ -237,6 +247,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
   overallRaceAdminister(action: string) {
     this.workingCars = [];
     if (action === 'start') {
+      this.raceLoading = true;
       const requests = this.cars.map((car) => {
         this.start_stopEngine(car.id, 'started');
         return this.engineService.engineMode(car.id, 'drive').pipe(
@@ -275,6 +286,7 @@ export class GarageComponent implements OnInit, AfterContentInit {
           trackDistance = 485;
         }
 
+        this.raceLoading = false;
         this.raceAnimation(
           'start',
           // screenWidth <= 970 ? Math.floor(trackDistance) : 775,

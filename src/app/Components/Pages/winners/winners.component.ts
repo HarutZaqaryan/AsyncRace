@@ -8,15 +8,22 @@ import { IWinnerDetails } from '../../../Models/IWinnerDetails';
 import { combineLatest } from 'rxjs';
 import { PaginationComponent } from '../../../Shared/pagination/pagination.component';
 import { MatIconModule } from '@angular/material/icon';
+import { LoadingSpinnerComponent } from '../../../Shared/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-winners',
   standalone: true,
-  imports: [MatTableModule,MatIconModule, PaginationComponent],
+  imports: [
+    MatTableModule,
+    MatIconModule,
+    PaginationComponent,
+    LoadingSpinnerComponent,
+  ],
   templateUrl: './winners.component.html',
   styleUrl: './winners.component.scss',
 })
 export class WinnersComponent implements OnInit {
+  public dataLoading: boolean = true;
   public displayedColumns: string[] = ['id', 'car', 'name', 'wins', 'bestTime'];
   public dataSource: IWinnerDetails[] = [];
   public carsPerPage: number = 5;
@@ -43,12 +50,10 @@ export class WinnersComponent implements OnInit {
       .getWinners(limit, page, sort, order)
       .subscribe((response: HttpResponse<IWinners[]>) => {
         console.log(response);
-        console.log('winners body',response.body);
-        
+        console.log('winners body', response.body);
+
         this.winners = response.body ?? [];
         this.totalCount = +response.headers.get('X-Total-Count')!;
-        // console.log('winners', this.winners);
-
         const requests = this.winners.map((winner) => {
           return this.carsService.getCar(winner.id);
         });
@@ -58,14 +63,12 @@ export class WinnersComponent implements OnInit {
           this.winnerDetails = [];
           res.map((carDetail, index) => {
             winnerDetail = { ...carDetail, ...response.body![index] };
-            // console.log('cardetail', carDetail);
-            // console.log('winnerdetail', winnerDetail);
             this.winnerDetails.push(winnerDetail);
           });
-
           this.dataSource = this.winnerDetails;
           console.log('winner detailsss', this.winnerDetails);
         });
+        this.dataLoading = false;
       });
   }
 

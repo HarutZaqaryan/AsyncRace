@@ -29,6 +29,51 @@
   }
 }
 
+.loadingBtn {
+  background-color: #111c52 !important;
+  opacity: 0.6;
+  color: #8ec6cb;
+  position: relative;
+  overflow: hidden;
+  --offset: 3px;
+  span,
+  mat-icon {
+    z-index: 100;
+  }
+}
+
+.loadingBtn::before {
+  content: "";
+  background: conic-gradient(transparent 270deg, #8ec6cb, transparent);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  aspect-ratio: 1;
+  width: 100%;
+  animation: rotate 2s linear infinite;
+}
+
+.loadingBtn::after {
+  content: "";
+  background: inherit;
+  border-radius: inherit;
+  position: absolute;
+  inset: var(--offset);
+  height: calc(100% - 2 * var(--offset));
+  width: calc(100% - 2 * var(--offset));
+}
+
+@keyframes rotate {
+  from {
+    transform: translate(-50%, -50%) scale(1.4) rotate(0turn);
+  }
+
+  to {
+    transform: translate(-50%, -50%) scale(1.4) rotate(1turn);
+  }
+}
+
 .arrows {
   font-family: "Kanit";
   max-width: 1000px;
@@ -47,12 +92,20 @@
 .garage__container {
   border-top: 0.5px dashed #fff;
   border-bottom: 0.5px dashed #fff;
-  min-height: 130px;
+  min-height: 150px;
   max-width: 1000px;
   margin: 0 auto;
   margin-top: 25px;
   border-left: 2px dotted #fff;
   border-right: 2px dotted #fff;
+
+  .loading-spinner {
+    width: 150px;
+    margin: 25px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 .garage__actions {
@@ -74,6 +127,9 @@
     .race-btn {
       border-radius: 10px;
       color: #8ec6cb;
+      &:disabled {
+        opacity: 0.6;
+      }
     }
 
     .reset-btn {
@@ -128,20 +184,20 @@
 }
 
 .generate-btn {
-  border-radius: 10px !important;
+  text-align: center;
   width: 80px;
-  color: #8ec6cb;
   height: 48px;
   display: flex;
   align-items: center;
   gap: 3px;
   background-color: transparent;
   border: 3px solid;
-  border-radius: 3px;
   font-size: 14px;
+  border-radius: 10px !important;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
+  color: #8ec6cb;
   &:hover {
     opacity: 0.6;
   }

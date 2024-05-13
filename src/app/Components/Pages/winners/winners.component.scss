@@ -24,6 +24,14 @@ table {
   font-family: "Kanit";
 }
 
+.loading-spinner {
+  width: 150px;
+  margin: 25px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .winners__container {
   max-width: 1000px;
   margin: 0 auto;

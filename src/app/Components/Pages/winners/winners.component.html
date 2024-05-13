@@ -1,5 +1,12 @@
 <div class="winners__heading">WINNERS - {{ totalCount }}</div>
 
+@if(dataLoading) {
+<div class="loading-spinner">
+  <app-loading-spinner></app-loading-spinner>
+</div>
+}
+
+@if(dataSource.length > 0){
 <div class="winners__container">
   <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
     <!-- Id Column -->
@@ -94,7 +101,7 @@
 
     <!-- Wins Column -->
     <ng-container matColumnDef="wins">
-      <th mat-header-cell *matHeaderCellDef >
+      <th mat-header-cell *matHeaderCellDef>
         Wins
         <button (click)="sort('wins', 'ASC')" class="btn">
           <mat-icon>arrow_downward</mat-icon></button
@@ -122,7 +129,6 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
 </div>
-
 <div class="winners__footer">
   <app-pagination
     [carsPerPage]="carsPerPage"
@@ -131,3 +137,4 @@
     (onPageChange)="onPageChange($event)"
   ></app-pagination>
 </div>
+}
