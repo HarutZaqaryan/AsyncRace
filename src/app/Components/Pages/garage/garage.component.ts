@@ -380,7 +380,7 @@ export class GarageComponent
               workingCar!.success = true;
               this.workingCars.push(workingCar!);
             } else {
-              if (result.statusText !== 500) {
+              if (result.status !== 500) {
                 // this.openSnackBar(result.message);
                 this.openSnackBar("Someone hacked all the cars. We're trying to fix it.");
               }
