@@ -1,5 +1,5 @@
 export interface IWinners {
-    id:number;
-    wins:number;
-    time:number
+  id: number;
+  wins: number;
+  time: number;
 }

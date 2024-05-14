@@ -32,6 +32,27 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 import { LoadingSpinnerComponent } from '../../../Shared/loading-spinner/loading-spinner.component';
 
+const CARS_PER_PAGE: number = 7;
+const NAME_MIN_LENGTH: number = 2;
+
+const FAULTY_ENGINE_STATUS = 500;
+
+const DEFAULT_TRACK_DISTANCE: number = 775;
+// const DEFAULT_TRACK_DISTANCE = (60.55 / 100) * screenWidth;
+const SCREEN_SIZE_BIGGEST: number = 1010;
+const TRACK_DISTANCE_BIGGEST: number = 675;
+const SCREEN_SIZE_BIG: number = 900;
+const TRACK_DISTANCE_BIG: number = 570;
+const SCREEN_SIZE_MEDIUM: number = 780;
+const TRACK_DISTANCE_MEDIUM: number = 515;
+const SCREEN_SIZE_SMALL: number = 500;
+const TRACK_DISTANCE_SMALL: number = 485;
+
+const MULTIPLE_TIMES: number = 2;
+const MULTIPLE_ZEROES: number = 10;
+
+const MIN_LENGTH_ERROR: string = 'This field must contain minimum 2 letters';
+
 @Component({
   selector: 'app-garage',
   standalone: true,
@@ -57,7 +78,7 @@ export class GarageComponent
 {
   cars: ICars[] = [];
   carElements: ElementRef[] = [];
-  carsPerPage: number = 7;
+  carsPerPage: number = CARS_PER_PAGE;
   currentPage: number = 1;
   totalCount: number = 0;
   selected: boolean = false;
@@ -86,16 +107,17 @@ export class GarageComponent
   creatingCarsNameError: string = '';
   creatingCarsName: FormControl = new FormControl('', [
     Validators.required,
-    Validators.minLength(2),
+    Validators.minLength(NAME_MIN_LENGTH),
   ]);
   @ViewChild('updateInput') updateInput!: ElementRef;
   updatingCarsNameError: string = '';
   updatingCarsName: FormControl = new FormControl('', [
     Validators.required,
-    Validators.minLength(2),
+    Validators.minLength(NAME_MIN_LENGTH),
   ]);
   creatingCarsColor: FormControl = new FormControl('#000000');
   updatingCarsColor: FormControl = new FormControl('#000000');
+  UPDATE_SNACKBARS_MESSAGE: string = '';
 
   constructor(
     private carsService: CarsServivce,
@@ -103,7 +125,7 @@ export class GarageComponent
     private winnersService: WinnersService,
     private dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private renderer: Renderer2
+    private renderer: Renderer2,
   ) {}
 
   ngOnInit(): void {
@@ -114,12 +136,12 @@ export class GarageComponent
     this.renderer.listen(
       this.createInput.nativeElement,
       'blur',
-      this.onCreateInputBlur.bind(this)
+      this.onCreateInputBlur.bind(this),
     );
     this.renderer.listen(
       this.updateInput.nativeElement,
       'blur',
-      this.onUpdateInputBlur.bind(this)
+      this.onUpdateInputBlur.bind(this),
     );
   }
 
@@ -143,65 +165,64 @@ export class GarageComponent
         this.dataLoading = false;
         this.dataError = err.message;
         console.log('erererer', err);
-      }
+      },
     );
   }
 
   generateCarsAutomaticly(): void {
     this.generateLoading = true;
     this.carsService.generateCars().subscribe(
-      (res) => {
+      () => {
         this.getCars(this.carsPerPage, this.currentPage);
         this.generateLoading = false;
       },
       (err) => {
         this.openSnackBar(err.message);
         this.generateLoading = false;
-      }
+      },
     );
+  }
+
+  existingCar(form:FormControl) {
+    const existingCar = this.cars.find(
+      (car) =>
+        car.name.toLocaleLowerCase() ===
+        form.value.toLocaleLowerCase(),
+    );
+    return existingCar;
   }
 
   createCar() {
     if (this.creatingCarsName.value !== '' && this.creatingCarsName.untouched) {
-      let existingCar = this.cars.find(
-        (car) =>
-          car.name.toLocaleLowerCase() ===
-          this.creatingCarsName.value.toLocaleLowerCase()
-      );
       if (this.creatingCarsName.status === 'VALID') {
         if (
-          !existingCar ||
+          !this.existingCar(this.creatingCarsName) ||
           this.creatingCarsName.value.toLocaleLowerCase() !==
-            existingCar!.name.toLocaleLowerCase()
+            this.existingCar(this.creatingCarsName)!.name.toLocaleLowerCase()
         ) {
           this.carsService
             .createCar(
               this.creatingCarsName.value,
-              this.creatingCarsColor.value
+              this.creatingCarsColor.value,
             )
             .subscribe(
-              (res) => {
+              () => {
                 this.openSnackBar(
                   `"${this.titleCase(
-                    this.creatingCarsName.value
-                  )}" has joined the race!`
+                    this.creatingCarsName.value,
+                  )}" has joined the race!`,
                 );
                 this.getCars(this.carsPerPage, this.currentPage);
-                this.creatingCarsName.setValue('');
-                this.creatingCarsName.reset();
-                this.creatingCarsColor.setValue('#000000');
+                this.resetInput('create');
               },
-              (err) => {
-                this.openSnackBar(err.message);
-              }
+              (err) => this.openSnackBar(err.message),
             );
         } else {
-          this.creatingCarsNameError = `Car with name "${existingCar.name}" already exists`;
+          this.creatingCarsNameError = `Car with name "${this.existingCar(this.creatingCarsName)!.name}" already exists`;
         }
       } else {
         if (this.creatingCarsName.hasError('minlength')) {
-          this.creatingCarsNameError =
-            'This field must contain minimum 2 letters';
+          this.creatingCarsNameError = MIN_LENGTH_ERROR;
         }
       }
     } else {
@@ -214,57 +235,50 @@ export class GarageComponent
 
   selectCar(id: number) {
     this.selected = true;
-    let selectedCar = this.cars.find((car) => car.id === id);
+    const selectedCar = this.cars.find((car) => car.id === id);
     this.selectedCarName = selectedCar!.name;
     this.updatingCarsId = selectedCar!.id;
     this.updatingCarsName.setValue(selectedCar!.name);
     this.updatingCarsColor.setValue(selectedCar!.color);
   }
 
-  updateCar() {
+  // * (Updated Car New Name) This line is collected externally because it is very long
+  getUpdatingCarName(name: string) {
+    return `"${this.titleCase(
+      this.selectedCarName,
+    )}" changed its name, now it performs under the name - "${this.titleCase(name)}"`;
+  }
+
+  updateCar() {    
     if (this.updatingCarsName.value !== '' && this.updatingCarsName.untouched) {
-      let existingCar = this.cars.find(
-        (car) =>
-          car.name.toLocaleLowerCase() ===
-          this.updatingCarsName.value.toLocaleLowerCase()
-      );
       if (this.updatingCarsName.status === 'VALID') {
         if (
-          !existingCar ||
+          !this.existingCar(this.updatingCarsName) ||
           this.updatingCarsName.value.toLocaleLowerCase() !==
-            existingCar.name.toLocaleLowerCase()
+            this.existingCar(this.updatingCarsName)!.name.toLocaleLowerCase()
         ) {
           this.carsService
             .updateCar(
               this.updatingCarsId,
               this.updatingCarsName.value,
-              this.updatingCarsColor.value
+              this.updatingCarsColor.value,
             )
             .subscribe(
-              (res) => {
+              () => {
                 this.openSnackBar(
-                  `"${this.titleCase(
-                    this.selectedCarName
-                  )}" changed its name, now it performs under the name - "${this.titleCase(
-                    this.updatingCarsName.value
-                  )}"`
+                  this.getUpdatingCarName(this.updatingCarsName.value),
                 );
                 this.getCars(this.carsPerPage, this.currentPage);
-                this.updatingCarsName.setValue('');
-                this.updatingCarsName.reset();
-                this.updatingCarsColor.setValue('#000000');
+                this.resetInput('update');
               },
-              (err) => {
-                this.openSnackBar(err.message);
-              }
+              (err) => this.openSnackBar(err.message),
             );
         } else {
-          this.updatingCarsNameError = `Car with name "${existingCar.name}" already exists`;
+          this.updatingCarsNameError = `Car with name "${this.existingCar(this.updatingCarsName)!.name}" already exists`;
         }
       } else {
         if (this.updatingCarsName.hasError('minlength')) {
-          this.updatingCarsNameError =
-            'This field must contain minimum 2 letters';
+          this.updatingCarsNameError = MIN_LENGTH_ERROR;
         }
       }
     } else {
@@ -302,13 +316,13 @@ export class GarageComponent
 
   removeCar(car: ICars) {
     this.winnersService.getAllWinners().subscribe((res) => {
-      let winner = res.find((winner) => winner.id === car.id);
+      const winner = res.find((winner) => winner.id === car.id);
       if (winner) {
         this.winnersService.deleteWinner(winner.id).subscribe(
           (response) => console.log('response', response),
           (err) => {
             this.openSnackBar(err.message);
-          }
+          },
         );
       }
     });
@@ -326,7 +340,7 @@ export class GarageComponent
     // });
     // ! }
 
-    this.carsService.removeCar(car.id).subscribe((res) => {
+    this.carsService.removeCar(car.id).subscribe(() => {
       this.getCars(this.carsPerPage, this.currentPage);
       this.updatingCarsName.setValue('');
       this.updatingCarsColor.setValue('#000000');
@@ -341,7 +355,7 @@ export class GarageComponent
 
   start_stopEngine(id: number, status: string) {
     this.disableRaceButton = true;
-    let car = this.cars.find((car) => car.id === id);
+    const car = this.cars.find((car) => car.id === id);
     this.engineService.start_stopEngine(id, status).subscribe(
       (res) => {
         car!.velocity = res.velocity;
@@ -350,7 +364,7 @@ export class GarageComponent
       },
       (err) => {
         this.openSnackBar(err.message);
-      }
+      },
     );
   }
 
@@ -366,52 +380,50 @@ export class GarageComponent
             this.start_stopEngine(car.id, 'stopped');
             car.success = false;
             return of(err);
-          })
+          }),
         );
       });
       combineLatest(requests).subscribe(
         (res) => {
           res.forEach((result) => {
             if (result.statusText === 'OK') {
-              let splitedUrl = result.url.split('=');
-              let workingCar = this.cars.find(
-                (car) => car.id == +splitedUrl[1].split('&')[0]
+              const splitedUrl = result.url.split('=');
+              const workingCar = this.cars.find(
+                (car) => car.id == +splitedUrl[1].split('&')[0],
               );
               workingCar!.success = true;
               this.workingCars.push(workingCar!);
             } else {
-              if (result.status !== 500) {
-                // this.openSnackBar(result.message);
-                this.openSnackBar("Someone hacked all the cars. We're trying to fix it.");
+              if (result.status !== FAULTY_ENGINE_STATUS) {
+                this.openSnackBar(
+                  "Someone hacked all the cars. We're trying to fix it.",
+                );
               }
             }
           });
-          let screenWidth = window.screen.width;
+          const screenWidth = window.screen.width;
           // let trackDistance = (60.55 / 100) * screenWidth;
-          let trackDistance = 775;
-          if (screenWidth <= 1010) {
-            trackDistance = 675;
+          let trackDistance = DEFAULT_TRACK_DISTANCE;
+          if (screenWidth <= SCREEN_SIZE_BIGGEST) {
+            trackDistance = TRACK_DISTANCE_BIGGEST;
           }
-          if (screenWidth <= 900) {
-            trackDistance = 570;
+          if (screenWidth <= SCREEN_SIZE_BIG) {
+            trackDistance = TRACK_DISTANCE_BIG;
           }
-          if (screenWidth <= 780) {
-            trackDistance = 515;
+          if (screenWidth <= SCREEN_SIZE_MEDIUM) {
+            trackDistance = TRACK_DISTANCE_MEDIUM;
           }
-          if (screenWidth <= 500) {
-            trackDistance = 485;
+          if (screenWidth <= SCREEN_SIZE_SMALL) {
+            trackDistance = TRACK_DISTANCE_SMALL;
           }
           this.raceLoading = false;
           this.raceAnimation(
             'start',
             // screenWidth <= 970 ? Math.floor(trackDistance) : 775,
             trackDistance,
-            this.workingCars
+            this.workingCars,
           );
         },
-        (err) => {
-          console.log('erererer', err);
-        }
       );
     } else {
       this.cars.map((car) => {
@@ -428,23 +440,25 @@ export class GarageComponent
   individualCarAnimation(
     carElement: HTMLDivElement,
     car: ICars,
-    status: string
+    status: string,
   ) {
     this.individualAnimationStart = true;
-    let screenWidth = window.screen.width;
-    let trackDistance = (60.55 / 100) * screenWidth;
-    if (screenWidth <= 1010) {
-      trackDistance = 675;
+    const screenWidth = window.screen.width;
+    let trackDistance = DEFAULT_TRACK_DISTANCE;
+
+    if (screenWidth <= SCREEN_SIZE_BIGGEST) {
+      trackDistance = TRACK_DISTANCE_BIGGEST;
     }
-    if (screenWidth <= 900) {
-      trackDistance = 570;
+    if (screenWidth <= SCREEN_SIZE_BIG) {
+      trackDistance = TRACK_DISTANCE_BIG;
     }
-    if (screenWidth <= 780) {
-      trackDistance = 515;
+    if (screenWidth <= SCREEN_SIZE_MEDIUM) {
+      trackDistance = TRACK_DISTANCE_MEDIUM;
     }
-    if (screenWidth <= 500) {
-      trackDistance = 485;
+    if (screenWidth <= SCREEN_SIZE_SMALL) {
+      trackDistance = TRACK_DISTANCE_SMALL;
     }
+
     if (status === 'started') {
       this.start_stopEngine(car.id, 'started');
       car.started = true;
@@ -458,15 +472,15 @@ export class GarageComponent
           carElement.style.transition = `${car.velocity}0ms ease-in`;
           carElement.style.transform = `translateX(${trackDistance}px)`;
         },
-        (err) => {
-          this.openSnackBar(err.message);
+        () => {
+          this.openSnackBar('Something wrong with cars engine');
           car.success = false;
           this.disableIndividualResetButton = false;
           this.disableResetButton = false;
           this.individualAnimationStart = false;
           this.animationStart = true;
           this.start_stopEngine(car.id, 'stopped');
-        }
+        },
       );
     } else {
       car.started = false;
@@ -476,7 +490,7 @@ export class GarageComponent
       this.individualAnimationStart = false;
       console.log('disable race button', this.disableIndividualRaceButton);
       console.log('cars', this.cars);
-      let allStopped = this.cars.every((car) => !car.started);
+      const allStopped = this.cars.every((car) => !car.started);
       if (allStopped) {
         setTimeout(() => {
           this.disableRaceButton = false;
@@ -500,14 +514,12 @@ export class GarageComponent
     }
     if (this.carElements) {
       if (action === 'start') {
-        let workingCarIds: number[] = [];
-
+        const workingCarIds: number[] = [];
         workingCars!.map((workingCar) => {
           workingCarIds.push(workingCar.id);
         });
-        let workingCarHTMLelements: ElementRef[] = [];
-
-        this.carElements.forEach((carElem: ElementRef, index) => {
+        const workingCarHTMLelements: ElementRef[] = [];
+        this.carElements.forEach((carElem: ElementRef) => {
           if (workingCarIds!.includes(+carElem.nativeElement.id)) {
             workingCarHTMLelements.push(carElem);
           }
@@ -518,16 +530,12 @@ export class GarageComponent
           }0ms ease-in`;
           carElem.nativeElement.style.transform = `translateX(${trackDistance}px)`;
         });
-        console.log('finish', this.workingCars);
         this.disableResetButton = false;
 
-        if (workingCars?.length) {
-          this.getWinners(workingCars);
-        }
+        if (workingCars?.length) this.getWinners(workingCars);
       } else {
         this.disableRaceButton = false;
         this.disableResetButton = true;
-
         this.carElements.forEach((carElem: ElementRef) => {
           carElem.nativeElement.style.transition = '1ms ease-in';
           carElem.nativeElement.style.transform = 'translateX(0px)';
@@ -537,50 +545,43 @@ export class GarageComponent
   }
 
   getWinners(cars: ICars[]) {
-    let carVelocities: number[] = [];
-    let winners: ICars[] = [];
+    const carVelocities: number[] = [];
+    const winners: ICars[] = [];
     cars.map((car) => {
       carVelocities.push(car.velocity!);
     });
-    let fastestCarVelocity = Math.min(...carVelocities);
-    let fastestCars = cars.filter((car) => car.velocity === fastestCarVelocity);
+    const fastestCarVelocity = Math.min(...carVelocities);
+    const fastestCars = cars.filter(
+      (car) => car.velocity === fastestCarVelocity,
+    );
     fastestCars.forEach((car) => {
       winners.push(car);
     });
-    console.log('winners from getwinners', winners);
-
     winners.map((winner) => {
       this.winnersService.getWinner(winner.id).subscribe(
         (res) => {
           this.winnersService
             .updateWinners(res.id, res.wins + 1, winner.velocity!)
-            .subscribe((res) => {
-              console.log('res from update car ', res);
-            });
-          console.log('rrresss', res);
+            .subscribe(() => {});
         },
-        (err) => {
-          console.log('here is an error');
-          console.log('winner body from animation', {
-            id: winner.id,
-            wins: 1,
-            time: winner.velocity!,
-          });
-
+        () => {
           this.winnersService
             .createWinner({ id: winner.id, wins: 1, time: winner.velocity! })
             .subscribe((res) => {
               console.log(res);
             });
-        }
+        },
       );
     });
 
-    setTimeout(() => {
-      this.dialog.open(WinnersPopupComponent, {
-        data: winners,
-      });
-    }, winners[0].velocity! * 2 * 10);
+    setTimeout(
+      () => {
+        this.dialog.open(WinnersPopupComponent, {
+          data: winners,
+        });
+      },
+      winners[0].velocity! * MULTIPLE_TIMES * MULTIPLE_ZEROES,
+    );
   }
 
   titleCase(str: string) {

@@ -1,6 +1,6 @@
-import { ICars } from "./ICars";
+import { ICars } from './ICars';
 
 export interface IEngine extends ICars {
-    velocity:number,
-    distance:number
+  velocity: number;
+  distance: number;
 }

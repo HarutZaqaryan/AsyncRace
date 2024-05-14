@@ -1,3 +1,3 @@
 export interface IDrive {
-    success:boolean
+  success: boolean;
 }

@@ -11,14 +11,14 @@ export const routes: Routes = [
     path: 'garage',
     loadComponent: () =>
       import('./Components/Pages/garage/garage.component').then(
-        (mod) => mod.GarageComponent
+        (mod) => mod.GarageComponent,
       ),
   },
   {
     path: 'winners',
     loadComponent: () =>
       import('./Components/Pages/winners/winners.component').then(
-        (mod) => mod.WinnersComponent
+        (mod) => mod.WinnersComponent,
       ),
   },
   {

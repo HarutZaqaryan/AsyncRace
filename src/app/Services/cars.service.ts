@@ -1,7 +1,7 @@
-import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpClient} from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ICars } from '../Models/ICars';
-import { Observable, catchError, forkJoin, of } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 
 type TCar = Omit<ICars, 'id'>;
 
@@ -235,7 +235,7 @@ export class CarsServivce {
       `${this.carsUrl}?_limit=${limit}&&_page=${page}`,
       {
         observe: 'response',
-      }
+      },
     );
   }
 
@@ -251,8 +251,8 @@ export class CarsServivce {
         this.http.post<TCar>(
           this.carsUrl,
           { name: car.name, color: car.color },
-          { headers: { 'Content-type': 'application/json' } }
-        )
+          { headers: { 'Content-type': 'application/json' } },
+        ),
       );
     });
 
@@ -263,7 +263,7 @@ export class CarsServivce {
     return this.http.post<TCar>(
       this.carsUrl,
       { name: carName, color: carColor },
-      { headers: { 'Content-type': 'application/json' } }
+      { headers: { 'Content-type': 'application/json' } },
     );
   }
 
@@ -271,7 +271,7 @@ export class CarsServivce {
     return this.http.put<TCar>(
       `${this.carsUrl}/${id}`,
       { name: carNewName, color: carNewColor },
-      { headers: { 'Content-type': 'application/json' } }
+      { headers: { 'Content-type': 'application/json' } },
     );
   }
 

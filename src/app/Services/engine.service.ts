@@ -12,16 +12,16 @@ export class EngineService {
   constructor(private http: HttpClient) {}
 
   start_stopEngine(id: number, status: string) {
-    let params = new HttpParams().set('id', id).set('status', status);
+    const params = new HttpParams().set('id', id).set('status', status);
     return this.http.patch<IEngine>(this.engineUrl, {}, { params });
   }
 
   engineMode(id: number, status: string) {
-    let params = new HttpParams().set('id', id).set('status', status);
+    const params = new HttpParams().set('id', id).set('status', status);
     return this.http.patch<IDrive>(
       this.engineUrl,
       {},
-      { params, observe: 'response' }
+      { params, observe: 'response' },
     );
   }
 }

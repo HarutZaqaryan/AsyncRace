@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient} from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { IWinners } from '../Models/IWinners';
 
@@ -21,7 +21,7 @@ export class WinnersService {
       sort
         ? `${this.winnersURL}?_limit=${limit}&&_page=${page}&&_sort=${sort}&&_order=${order}`
         : `${this.winnersURL}?_limit=${limit}&&_page=${page}`,
-      { observe: 'response' }
+      { observe: 'response' },
     );
   }
 
@@ -39,7 +39,7 @@ export class WinnersService {
     return this.http.put<TWinner>(
       `${this.winnersURL}/${id}`,
       { wins, time },
-      { headers: { 'Content-type': 'application/json' } }
+      { headers: { 'Content-type': 'application/json' } },
     );
   }
 

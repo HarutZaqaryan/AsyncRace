@@ -10,6 +10,7 @@ import { PaginationComponent } from '../../../Shared/pagination/pagination.compo
 import { MatIconModule } from '@angular/material/icon';
 import { LoadingSpinnerComponent } from '../../../Shared/loading-spinner/loading-spinner.component';
 
+const CARS_PER_PAGE: number = 5;
 @Component({
   selector: 'app-winners',
   standalone: true,
@@ -26,10 +27,10 @@ export class WinnersComponent implements OnInit {
   public dataLoading: boolean = true;
   public displayedColumns: string[] = ['id', 'car', 'name', 'wins', 'bestTime'];
   public dataSource: IWinnerDetails[] = [];
-  public carsPerPage: number = 5;
+  public carsPerPage: number = CARS_PER_PAGE;
   public currentPage: number = 1;
   public totalCount: number = 0;
-  public dataError:string = '';
+  public dataError: string = '';
   private winners: IWinners[] = [];
   private winnerDetails: IWinnerDetails[] = [];
   private sorted: boolean = false;
@@ -37,10 +38,9 @@ export class WinnersComponent implements OnInit {
   private sortTerm: string = '';
   private sortOrder: string = '';
 
-
   constructor(
     private winnersService: WinnersService,
-    private carsService: CarsServivce
+    private carsService: CarsServivce,
   ) {}
 
   ngOnInit(): void {
@@ -48,12 +48,8 @@ export class WinnersComponent implements OnInit {
   }
 
   getWinners(limit: number, page: number, sort?: string, order?: string): void {
-    this.winnersService
-      .getWinners(limit, page, sort, order)
-      .subscribe((response: HttpResponse<IWinners[]>) => {
-        console.log(response);
-        console.log('winners body', response.body);
-
+    this.winnersService.getWinners(limit, page, sort, order).subscribe(
+      (response: HttpResponse<IWinners[]>) => {
         this.winners = response.body ?? [];
         this.totalCount = +response.headers.get('X-Total-Count')!;
         const requests = this.winners.map((winner) => {
@@ -68,14 +64,15 @@ export class WinnersComponent implements OnInit {
             this.winnerDetails.push(winnerDetail);
           });
           this.dataSource = this.winnerDetails;
-          console.log('winner detailsss', this.winnerDetails);
+          this.dataLoading = false;
         });
-        this.dataLoading = false;
-      },(err) => {
+      },
+      (err) => {
         this.dataLoading = false;
         this.dataError = err.message;
-        console.log('erererer',err);
-      });
+        console.log('erererer', err);
+      },
+    );
   }
 
   sort(sortBy: string, order: string) {
@@ -107,7 +104,7 @@ export class WinnersComponent implements OnInit {
         this.carsPerPage,
         this.currentPage,
         this.sortTerm,
-        this.sortOrder
+        this.sortOrder,
       );
     } else {
       this.getWinners(this.carsPerPage, this.currentPage);

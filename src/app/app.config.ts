@@ -13,7 +13,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideClientHydration(
-      withHttpTransferCacheOptions({ includeHeaders: ['X-Total-Count'] })
+      withHttpTransferCacheOptions({ includeHeaders: ['X-Total-Count'] }),
     ),
     provideHttpClient(),
     provideAnimationsAsync(),

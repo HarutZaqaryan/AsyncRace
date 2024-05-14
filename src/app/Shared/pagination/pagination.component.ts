@@ -1,6 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
+const CURRENT_PAGE:number = 1;
+const TOTAL_COUNT:number = 0;
+const CARS_PER_PAGE:number = 3;
 @Component({
   selector: 'app-pagination',
   standalone: true,
@@ -9,11 +12,11 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './pagination.component.scss',
 })
 export class PaginationComponent {
-  @Input() currentPage = 1;
-  @Input() totalCount = 0;
-  @Input() carsPerPage = 3;
+  @Input() currentPage = CURRENT_PAGE;
+  @Input() totalCount = TOTAL_COUNT;
+  @Input() carsPerPage = CARS_PER_PAGE;
 
-  @Output() onPageChange: EventEmitter<any> = new EventEmitter();
+  @Output() onPageChange: EventEmitter<number> = new EventEmitter();
 
   callParentOnPageChange(page: number) {
     this.onPageChange.emit(page);
