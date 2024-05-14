@@ -6,6 +6,18 @@
 </div>
 }
 
+@if(dataSource.length === 0 && !dataLoading && !dataError) {
+  <div class="no-data">
+    <p>Sorry, dear fan, but there is no winner yet.</p>
+  </div>
+  }
+
+  @if(dataError) {
+    <div class="data-error">
+      <p>{{dataError}}</p>
+    </div>
+    }
+
 @if(dataSource.length > 0){
 <div class="winners__container">
   <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">

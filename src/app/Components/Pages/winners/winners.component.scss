@@ -38,6 +38,27 @@ table {
   margin-top: 25px;
 }
 
+.no-data,
+.data-error {
+  max-width: 1000px;
+  color: #fff;
+  font-size: 18px;
+  margin: 5% auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #fff;
+  p {
+    padding-top: 50px;
+    padding-bottom: 50px;
+  }
+}
+
+.data-error {
+  font-size: 14px;
+  color: rgb(185, 0, 0);
+}
+
 .winners__footer {
   max-width: 1000px;
   margin: 50px auto;
@@ -63,7 +84,9 @@ table {
 @media (max-width: 1020px) {
   .winners__container,
   .winners__heading,
-  .winners__footer {
+  .winners__footer,
+  .data-error,
+  .no-data {
     width: 750px;
   }
 }
@@ -71,7 +94,9 @@ table {
 @media (max-width: 770px) {
   .winners__container,
   .winners__heading,
-  .winners__footer {
+  .winners__footer,
+  .data-error,
+  .no-data {
     width: 680px;
   }
 }
@@ -79,7 +104,9 @@ table {
 @media (max-width: 700px) {
   .winners__container,
   .winners__heading,
-  .winners__footer {
+  .winners__footer,
+  .data-error,
+  .no-data {
     width: 680px;
     margin-left: 10px;
   }

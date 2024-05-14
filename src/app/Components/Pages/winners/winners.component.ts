@@ -29,12 +29,14 @@ export class WinnersComponent implements OnInit {
   public carsPerPage: number = 5;
   public currentPage: number = 1;
   public totalCount: number = 0;
+  public dataError:string = '';
   private winners: IWinners[] = [];
   private winnerDetails: IWinnerDetails[] = [];
   private sorted: boolean = false;
   private sortBy: string = '';
   private sortTerm: string = '';
   private sortOrder: string = '';
+
 
   constructor(
     private winnersService: WinnersService,
@@ -69,6 +71,10 @@ export class WinnersComponent implements OnInit {
           console.log('winner detailsss', this.winnerDetails);
         });
         this.dataLoading = false;
+      },(err) => {
+        this.dataLoading = false;
+        this.dataError = err.message;
+        console.log('erererer',err);
       });
   }
 

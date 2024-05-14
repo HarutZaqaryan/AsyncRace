@@ -104,11 +104,19 @@
       <div class="loading-spinner">
         <app-loading-spinner></app-loading-spinner>
       </div>
-      } @if(cars.length === 0 && !dataLoading) {
+      } @if(cars.length === 0 && !dataLoading && !dataError) {
       <div class="no-data">
         <p>Sorry, dear fan, but not a single car came to the race today.</p>
       </div>
-      } @for (car of cars; track car) {
+      }
+
+      @if(dataError) {
+        <div class="data-error">
+          <p>{{dataError}}</p>
+        </div>
+        }
+      
+      @for (car of cars; track car) {
       <div class="racing__line">
         <div class="line__actions">
           <div class="car__actions">

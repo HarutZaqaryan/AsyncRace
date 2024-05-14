@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ICars } from '../Models/ICars';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable, catchError, forkJoin, of } from 'rxjs';
 
 type TCar = Omit<ICars, 'id'>;
 

@@ -77,6 +77,8 @@ export class GarageComponent
   disableIndividualRaceButton = false;
   disableIndividualResetButton = true;
 
+  dataError: string = '';
+
   @ViewChildren('animatingCars') animatingCars!: QueryList<ElementRef>;
   workingCars: ICars[] = [];
 
@@ -130,21 +132,33 @@ export class GarageComponent
   }
 
   getCars(limit: number, page: number): void {
-    this.carsService
-      .getCars(limit, page)
-      .subscribe((res: HttpResponse<ICars[]>) => {
+    this.carsService.getCars(limit, page).subscribe(
+      (res: HttpResponse<ICars[]>) => {
         this.dataLoading = false;
         this.cars = res.body ?? [];
         this.totalCount = +res.headers.get('X-Total-Count')!;
-      });
+        console.log('res', res);
+      },
+      (err) => {
+        this.dataLoading = false;
+        this.dataError = err.message;
+        console.log('erererer', err);
+      }
+    );
   }
 
   generateCarsAutomaticly(): void {
     this.generateLoading = true;
-    this.carsService.generateCars().subscribe((res) => {
-      this.getCars(this.carsPerPage, this.currentPage);
-      this.generateLoading = false;
-    });
+    this.carsService.generateCars().subscribe(
+      (res) => {
+        this.getCars(this.carsPerPage, this.currentPage);
+        this.generateLoading = false;
+      },
+      (err) => {
+        this.openSnackBar(err.message);
+        this.generateLoading = false;
+      }
+    );
   }
 
   createCar() {
@@ -165,17 +179,22 @@ export class GarageComponent
               this.creatingCarsName.value,
               this.creatingCarsColor.value
             )
-            .subscribe((res) => {
-              this.openSnackBar(
-                `"${this.titleCase(
-                  this.creatingCarsName.value
-                )}" has joined the race!`
-              );
-              this.getCars(this.carsPerPage, this.currentPage);
-              this.creatingCarsName.setValue('');
-              this.creatingCarsName.reset();
-              this.creatingCarsColor.setValue('#000000');
-            });
+            .subscribe(
+              (res) => {
+                this.openSnackBar(
+                  `"${this.titleCase(
+                    this.creatingCarsName.value
+                  )}" has joined the race!`
+                );
+                this.getCars(this.carsPerPage, this.currentPage);
+                this.creatingCarsName.setValue('');
+                this.creatingCarsName.reset();
+                this.creatingCarsColor.setValue('#000000');
+              },
+              (err) => {
+                this.openSnackBar(err.message);
+              }
+            );
         } else {
           this.creatingCarsNameError = `Car with name "${existingCar.name}" already exists`;
         }
@@ -221,19 +240,24 @@ export class GarageComponent
               this.updatingCarsName.value,
               this.updatingCarsColor.value
             )
-            .subscribe((res) => {
-              this.openSnackBar(
-                `"${this.titleCase(
-                  this.selectedCarName
-                )}" changed its name, now it performs under the name - "${this.titleCase(
-                  this.updatingCarsName.value
-                )}"`
-              );
-              this.getCars(this.carsPerPage, this.currentPage);
-              this.updatingCarsName.setValue('');
-              this.updatingCarsName.reset();
-              this.updatingCarsColor.setValue('#000000');
-            });
+            .subscribe(
+              (res) => {
+                this.openSnackBar(
+                  `"${this.titleCase(
+                    this.selectedCarName
+                  )}" changed its name, now it performs under the name - "${this.titleCase(
+                    this.updatingCarsName.value
+                  )}"`
+                );
+                this.getCars(this.carsPerPage, this.currentPage);
+                this.updatingCarsName.setValue('');
+                this.updatingCarsName.reset();
+                this.updatingCarsColor.setValue('#000000');
+              },
+              (err) => {
+                this.openSnackBar(err.message);
+              }
+            );
         } else {
           this.updatingCarsNameError = `Car with name "${existingCar.name}" already exists`;
         }
@@ -280,9 +304,12 @@ export class GarageComponent
     this.winnersService.getAllWinners().subscribe((res) => {
       let winner = res.find((winner) => winner.id === car.id);
       if (winner) {
-        this.winnersService
-          .deleteWinner(winner.id)
-          .subscribe((response) => console.log('response', response));
+        this.winnersService.deleteWinner(winner.id).subscribe(
+          (response) => console.log('response', response),
+          (err) => {
+            this.openSnackBar(err.message);
+          }
+        );
       }
     });
 
@@ -315,12 +342,16 @@ export class GarageComponent
   start_stopEngine(id: number, status: string) {
     this.disableRaceButton = true;
     let car = this.cars.find((car) => car.id === id);
-    this.engineService.start_stopEngine(id, status).subscribe((res) => {
-      // let car = this.cars.find((car) => car.id === id);
-      car!.velocity = res.velocity;
-      car!.distance = res.distance;
-      console.log('from start-stop', status, car!.name, '-', car!.velocity);
-    });
+    this.engineService.start_stopEngine(id, status).subscribe(
+      (res) => {
+        car!.velocity = res.velocity;
+        car!.distance = res.distance;
+        console.log('from start-stop', status, car!.name, '-', car!.velocity);
+      },
+      (err) => {
+        this.openSnackBar(err.message);
+      }
+    );
   }
 
   overallRaceAdminister(action: string) {
@@ -338,40 +369,50 @@ export class GarageComponent
           })
         );
       });
-      combineLatest(requests).subscribe((res) => {
-        res.forEach((result) => {
-          if (result.statusText === 'OK') {
-            let splitedUrl = result.url.split('=');
-            let workingCar = this.cars.find(
-              (car) => car.id == +splitedUrl[1].split('&')[0]
-            );
-            workingCar!.success = true;
-            this.workingCars.push(workingCar!);
+      combineLatest(requests).subscribe(
+        (res) => {
+          res.forEach((result) => {
+            if (result.statusText === 'OK') {
+              let splitedUrl = result.url.split('=');
+              let workingCar = this.cars.find(
+                (car) => car.id == +splitedUrl[1].split('&')[0]
+              );
+              workingCar!.success = true;
+              this.workingCars.push(workingCar!);
+            } else {
+              if (result.statusText !== 500) {
+                // this.openSnackBar(result.message);
+                this.openSnackBar("Someone hacked all the cars. We're trying to fix it.");
+              }
+            }
+          });
+          let screenWidth = window.screen.width;
+          // let trackDistance = (60.55 / 100) * screenWidth;
+          let trackDistance = 775;
+          if (screenWidth <= 1010) {
+            trackDistance = 675;
           }
-        });
-        let screenWidth = window.screen.width;
-        // let trackDistance = (60.55 / 100) * screenWidth;
-        let trackDistance = 775;
-        if (screenWidth <= 1010) {
-          trackDistance = 675;
+          if (screenWidth <= 900) {
+            trackDistance = 570;
+          }
+          if (screenWidth <= 780) {
+            trackDistance = 515;
+          }
+          if (screenWidth <= 500) {
+            trackDistance = 485;
+          }
+          this.raceLoading = false;
+          this.raceAnimation(
+            'start',
+            // screenWidth <= 970 ? Math.floor(trackDistance) : 775,
+            trackDistance,
+            this.workingCars
+          );
+        },
+        (err) => {
+          console.log('erererer', err);
         }
-        if (screenWidth <= 900) {
-          trackDistance = 570;
-        }
-        if (screenWidth <= 780) {
-          trackDistance = 515;
-        }
-        if (screenWidth <= 500) {
-          trackDistance = 485;
-        }
-        this.raceLoading = false;
-        this.raceAnimation(
-          'start',
-          // screenWidth <= 970 ? Math.floor(trackDistance) : 775,
-          trackDistance,
-          this.workingCars
-        );
-      });
+      );
     } else {
       this.cars.map((car) => {
         this.start_stopEngine(car.id, 'stopped');
@@ -418,6 +459,7 @@ export class GarageComponent
           carElement.style.transform = `translateX(${trackDistance}px)`;
         },
         (err) => {
+          this.openSnackBar(err.message);
           car.success = false;
           this.disableIndividualResetButton = false;
           this.disableResetButton = false;
@@ -456,7 +498,6 @@ export class GarageComponent
     if (!workingCars?.length) {
       this.disableResetButton = true;
     }
-    // ToDo // Race Loading
     if (this.carElements) {
       if (action === 'start') {
         let workingCarIds: number[] = [];

@@ -107,7 +107,8 @@
     align-items: center;
   }
 
-  .no-data {
+  .no-data,
+  .data-error {
     color: #fff;
     font-size: 18px;
     width: 560px;
@@ -115,6 +116,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .data-error {
+    width: 600px;
+    font-size: 14px;
+    color: rgb(185, 0, 0);
   }
 }
 
@@ -166,7 +173,6 @@
       }
 
       mat-form-field {
-        // width: 65%;
         height: 70px;
       }
 
@@ -205,7 +211,6 @@
 }
 
 .example-full-width {
-  // width: 65%;
   width: 100%;
 }
 
@@ -390,6 +395,12 @@
     width: 900px;
   }
 
+  .garage__actions {
+    .create-update__actions {
+      width: 68%;
+    }
+  }
+
   .track {
     width: 575px;
     .stopped-sign {
@@ -464,7 +475,7 @@
       .c_u-input {
         .color-create_btn {
           // width: 50px;
-          width: 35px;
+          width: 10px;
           input,
           button {
             height: 21px;
@@ -531,7 +542,13 @@
   .garage__actions {
     width: 665px;
     .create-update__actions {
+      width: 75%;
       .c_u-input {
+        gap: 5px;
+        .create-input,
+        .update-input {
+          width: 55%;
+        }
         .color-create_btn {
           width: 25px;
         }
