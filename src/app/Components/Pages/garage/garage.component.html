@@ -56,7 +56,7 @@
         <div class="update-input">
           <mat-form-field class="example-full-width">
             <mat-label>Car Name</mat-label>
-            <input [formControl]="updatingCarsName" matInput #updateInput/>
+            <input [formControl]="updatingCarsName" matInput #updateInput />
             <button
               matSuffix
               mat-icon-button
@@ -76,7 +76,12 @@
             placeholder="Color"
             [formControl]="updatingCarsColor"
           />
-          <button mat-flat-button (click)="updateCar()" class="c_u-btn"  [disabled]="!selected">
+          <button
+            mat-flat-button
+            (click)="updateCar()"
+            class="c_u-btn"
+            [disabled]="!selected"
+          >
             Update
           </button>
         </div>

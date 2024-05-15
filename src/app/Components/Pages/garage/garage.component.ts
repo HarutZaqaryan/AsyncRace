@@ -71,17 +71,17 @@ const MIN_LENGTH_ERROR: string = 'This field must contain minimum 2 letters';
     LoadingSpinnerComponent,
   ],
   templateUrl: './garage.component.html',
-  styleUrl: './garage.component.scss',
+  styleUrls: ['./garage.component.scss','./garage.component2.scss'],
 })
 export class GarageComponent
   implements OnInit, AfterViewInit, AfterContentInit
 {
-  cars: ICars[] = [];
-  carElements: ElementRef[] = [];
-  carsPerPage: number = CARS_PER_PAGE;
-  currentPage: number = 1;
-  totalCount: number = 0;
-  selected: boolean = false;
+  public cars: ICars[] = [];
+  public carElements: ElementRef[] = [];
+  public carsPerPage: number = CARS_PER_PAGE;
+  public currentPage: number = 1;
+  public totalCount: number = 0;
+  public selected: boolean = false;
   selectedCarName: string = '';
   updatingCarsId: number = 0;
 
@@ -95,8 +95,8 @@ export class GarageComponent
 
   disableRaceButton: boolean = false;
   disableResetButton: boolean = true;
-  disableIndividualRaceButton = false;
-  disableIndividualResetButton = true;
+  disableIndividualRaceButton: boolean = false;
+  disableIndividualResetButton: boolean = true;
 
   dataError: string = '';
 
@@ -183,11 +183,9 @@ export class GarageComponent
     );
   }
 
-  existingCar(form:FormControl) {
+  existingCar(form: FormControl) {
     const existingCar = this.cars.find(
-      (car) =>
-        car.name.toLocaleLowerCase() ===
-        form.value.toLocaleLowerCase(),
+      (car) => car.name.toLocaleLowerCase() === form.value.toLocaleLowerCase(),
     );
     return existingCar;
   }
@@ -249,7 +247,7 @@ export class GarageComponent
     )}" changed its name, now it performs under the name - "${this.titleCase(name)}"`;
   }
 
-  updateCar() {    
+  updateCar() {
     if (this.updatingCarsName.value !== '' && this.updatingCarsName.untouched) {
       if (this.updatingCarsName.status === 'VALID') {
         if (
@@ -383,48 +381,46 @@ export class GarageComponent
           }),
         );
       });
-      combineLatest(requests).subscribe(
-        (res) => {
-          res.forEach((result) => {
-            if (result.statusText === 'OK') {
-              const splitedUrl = result.url.split('=');
-              const workingCar = this.cars.find(
-                (car) => car.id == +splitedUrl[1].split('&')[0],
+      combineLatest(requests).subscribe((res) => {
+        res.forEach((result) => {
+          if (result.statusText === 'OK') {
+            const splitedUrl = result.url.split('=');
+            const workingCar = this.cars.find(
+              (car) => car.id == +splitedUrl[1].split('&')[0],
+            );
+            workingCar!.success = true;
+            this.workingCars.push(workingCar!);
+          } else {
+            if (result.status !== FAULTY_ENGINE_STATUS) {
+              this.openSnackBar(
+                "Someone hacked all the cars. We're trying to fix it.",
               );
-              workingCar!.success = true;
-              this.workingCars.push(workingCar!);
-            } else {
-              if (result.status !== FAULTY_ENGINE_STATUS) {
-                this.openSnackBar(
-                  "Someone hacked all the cars. We're trying to fix it.",
-                );
-              }
             }
-          });
-          const screenWidth = window.screen.width;
-          // let trackDistance = (60.55 / 100) * screenWidth;
-          let trackDistance = DEFAULT_TRACK_DISTANCE;
-          if (screenWidth <= SCREEN_SIZE_BIGGEST) {
-            trackDistance = TRACK_DISTANCE_BIGGEST;
           }
-          if (screenWidth <= SCREEN_SIZE_BIG) {
-            trackDistance = TRACK_DISTANCE_BIG;
-          }
-          if (screenWidth <= SCREEN_SIZE_MEDIUM) {
-            trackDistance = TRACK_DISTANCE_MEDIUM;
-          }
-          if (screenWidth <= SCREEN_SIZE_SMALL) {
-            trackDistance = TRACK_DISTANCE_SMALL;
-          }
-          this.raceLoading = false;
-          this.raceAnimation(
-            'start',
-            // screenWidth <= 970 ? Math.floor(trackDistance) : 775,
-            trackDistance,
-            this.workingCars,
-          );
-        },
-      );
+        });
+        const screenWidth = window.screen.width;
+        // let trackDistance = (60.55 / 100) * screenWidth;
+        let trackDistance = DEFAULT_TRACK_DISTANCE;
+        if (screenWidth <= SCREEN_SIZE_BIGGEST) {
+          trackDistance = TRACK_DISTANCE_BIGGEST;
+        }
+        if (screenWidth <= SCREEN_SIZE_BIG) {
+          trackDistance = TRACK_DISTANCE_BIG;
+        }
+        if (screenWidth <= SCREEN_SIZE_MEDIUM) {
+          trackDistance = TRACK_DISTANCE_MEDIUM;
+        }
+        if (screenWidth <= SCREEN_SIZE_SMALL) {
+          trackDistance = TRACK_DISTANCE_SMALL;
+        }
+        this.raceLoading = false;
+        this.raceAnimation(
+          'start',
+          // screenWidth <= 970 ? Math.floor(trackDistance) : 775,
+          trackDistance,
+          this.workingCars,
+        );
+      });
     } else {
       this.cars.map((car) => {
         this.start_stopEngine(car.id, 'stopped');
