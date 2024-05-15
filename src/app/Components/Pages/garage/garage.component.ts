@@ -129,6 +129,11 @@ export class GarageComponent
   ) {}
 
   ngOnInit(): void {
+    this.dataError = '';
+    console.log('data error',this.dataError);
+    console.log('cars.length',this.cars.length);
+    console.log('data loading',this.dataLoading);
+    
     this.getCars(this.carsPerPage, this.currentPage);
   }
 
@@ -164,9 +169,9 @@ export class GarageComponent
       (err) => {
         this.dataLoading = false;
         this.disableRaceButton = true;
-        setTimeout(() => {
-          this.dataError = err.message;
-        }, 100);
+        // setTimeout(() => {
+          this.dataError = err.name;
+        // }, 100);
         console.log('erererer', err);
       },
     );

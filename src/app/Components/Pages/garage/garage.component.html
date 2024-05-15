@@ -105,20 +105,18 @@
 
   <div class="garage__container">
     <div class="garage__racing-track">
-      @if (dataLoading && cars.length == 0) {
+
+      @if (dataLoading && cars.length == 0 && !dataError) {
         <div class="loading-spinner">
           <app-loading-spinner></app-loading-spinner>
         </div>
-      }
-      @if (cars.length === 0 && !dataLoading && !dataError) {
+      } @else if (!dataLoading && dataError) {
+        <div class="data-error">
+          <p>{{ dataError }} - Error occurs from server</p>
+        </div>
+      } @else if(cars.length === 0 && !dataLoading ){
         <div class="no-data">
           <p>Sorry, dear fan, but not a single car came to the race today.</p>
-        </div>
-      }
-
-      @if (dataError) {
-        <div class="data-error">
-          <p>{{ dataError }}</p>
         </div>
       }
 
