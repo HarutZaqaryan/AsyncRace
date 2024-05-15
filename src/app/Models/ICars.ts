@@ -5,5 +5,6 @@ export interface ICars {
   velocity?: number;
   distance?: number;
   started?: boolean;
+  animationStarted?: boolean;
   success?: boolean;
 }

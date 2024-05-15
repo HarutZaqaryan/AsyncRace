@@ -7,9 +7,9 @@
     "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "lint": "eslint src/app --fix",
     "format": "prettier --write \"src/**/*.+(ts|html|css|scss|json)\"",
     "ci:format": "prettier --check \"src/**/*.+(ts|html|css|scss|json)\"",
-    "lint": "eslint src/app --fix",
     "serve:ssr:Async-Race": "node dist/async-race/server/server.mjs"
   },
   "private": true,

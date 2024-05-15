@@ -138,9 +138,9 @@
                 (click)="
                   individualCarAnimation(individualCarElement, car, 'started')
                 "
-                [disabled]="disableIndividualRaceButton || car.started"
+                [disabled]="disableIndividualRaceButton || car.animationStarted"
                 [ngClass]="{
-                  loadingBtn: individualAnimationStart && car.started
+                  loadingBtn: individualAnimationStart && car.animationStarted
                 }"
               >
                 <mat-icon>play_arrow</mat-icon>
@@ -233,7 +233,7 @@
           <div class="track">
             <p class="start">Start</p>
             <h3 class="car-name">
-              @if (animationStart && car.success === false) {
+              @if ((car.started || animationStart) && car.success === false) {
                 <div
                   class="stopped-sign"
                   title="Something is wrong with this cars engine"

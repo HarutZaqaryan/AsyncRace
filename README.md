@@ -12,7 +12,7 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 
 # Deployment
 
-The front end part of this project was deployed here - [Deployment](https://github.com/angular/angular-cli)
+The front end part of this project was deployed here - [Deployment](https://harut-async-race.netlify.app/)
 
 ---
 
@@ -138,3 +138,8 @@ The front end part of this project was deployed here - [Deployment](https://gith
 
 ---
 
+# Deployment Description
+
+The project's user interface and race functionality are absolutely adaptive for devices of any width.
+The UI contains angular material components as well as components with my own styles.
+There are many features for a user-friendly and beautiful user interface design.

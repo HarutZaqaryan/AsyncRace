@@ -1,302 +1,301 @@
 .track {
-    border-top: 2px dashed #fff;
-    border-bottom: 2px dashed #fff;
-    border-left: 1px dotted #a57680;
-    border-right: 1px dotted #8ec6cb;
-    width: 680px;
-    height: 80px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  
-    p {
-      font-family: "Kanit";
-      letter-spacing: 0.5px;
-      font-weight: 700;
-      font-size: 20px;
-      letter-spacing: 3px;
-      transform: rotate(90deg);
-      font-style: italic;
-    }
-  
-    h3 {
-      font-family: "CodyStar";
-      font-weight: 400;
-      color: #fff;
-      margin-top: 10px;
-    }
-  
-    .car-name {
-      width: 500px;
-      font-size: 30px;
-      letter-spacing: 10px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 25px;
-    }
-  
-    .stopped-sign {
-      width: 20px;
-      height: 20px;
-      border: 1px solid rgb(153, 20, 20);
-      border-radius: 50%;
-      background-color: rgb(153, 20, 20);
-      margin-left: -47px;
-      cursor: pointer;
-      animation: scale-animation 2s infinite;
-    }
-  
-    @keyframes scale-animation {
-      0% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.3);
-      }
-      100% {
-        transform: scale(1);
-      }
-    }
-  
-    .start {
-      color: #a57680;
-      margin-top: 8px;
-      margin-left: -15px;
-    }
-    .finish {
-      margin-top: 14px;
-      margin-right: -20px;
-      color: #8ec6cb;
-    }
-  }
-  
-  .car {
-    z-index: 10;
-  }
-  
-  .garage__footer {
-    max-width: 1000px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 20px auto;
+  border-top: 2px dashed #fff;
+  border-bottom: 2px dashed #fff;
+  border-left: 1px dotted #a57680;
+  border-right: 1px dotted #8ec6cb;
+  width: 680px;
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  p {
     font-family: "Kanit";
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 3px;
+    transform: rotate(90deg);
+    font-style: italic;
+  }
+
+  h3 {
+    font-family: "CodyStar";
+    font-weight: 400;
     color: #fff;
-    padding-bottom: 50px;
-    .garage-quantity {
-      font-size: 30px;
-      letter-spacing: 5px;
-    }
+    margin-top: 10px;
   }
-  
-  .stop-warn {
-    width: 30px;
-    height: 30px;
-    background-color: red;
+
+  .car-name {
+    width: 500px;
+    font-size: 30px;
+    letter-spacing: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+  }
+
+  .stopped-sign {
+    width: 20px;
+    height: 20px;
+    border: 1px solid rgb(153, 20, 20);
     border-radius: 50%;
+    background-color: rgb(153, 20, 20);
+    margin-left: -47px;
+    cursor: pointer;
+    animation: scale-animation 2s infinite;
   }
-  
-  // * Responsive Design
-  
-  @media (max-width: 1090px) {
-    .garage__actions {
-      .create-update__actions {
-        gap: unset;
-      }
+
+  @keyframes scale-animation {
+    0% {
+      transform: scale(1);
     }
-  
-    .btn {
-      width: 90px;
+    50% {
+      transform: scale(1.3);
     }
-  
-    .c_u-input {
-      gap: 8px;
+    100% {
+      transform: scale(1);
     }
   }
-  
-  @media (max-width: 1010px) {
-    .container {
-      width: 900px;
-    }
-  
-    .garage__actions {
-      .create-update__actions {
-        width: 68%;
-      }
-    }
-  
-    .track {
-      width: 575px;
-      .stopped-sign {
-        margin-left: 0px;
-      }
-    }
-  
-    .arrows {
-      font-size: 42px;
+
+  .start {
+    color: #a57680;
+    margin-top: 8px;
+    margin-left: -15px;
+  }
+  .finish {
+    margin-top: 14px;
+    margin-right: -20px;
+    color: #8ec6cb;
+  }
+}
+
+.car {
+  z-index: 10;
+}
+
+.garage__footer {
+  max-width: 1000px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px auto;
+  font-family: "Kanit";
+  color: #fff;
+  padding-bottom: 50px;
+  .garage-quantity {
+    font-size: 30px;
+    letter-spacing: 5px;
+  }
+}
+
+.stop-warn {
+  width: 30px;
+  height: 30px;
+  background-color: red;
+  border-radius: 50%;
+}
+
+// * Responsive Design
+
+@media (max-width: 1090px) {
+  .garage__actions {
+    .create-update__actions {
+      gap: unset;
     }
   }
-  
-  @media (max-width: 990px) {
-    .track {
-      width: 580px;
+
+  .btn {
+    width: 90px;
+  }
+
+  .c_u-input {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 1010px) {
+  .container {
+    width: 900px;
+  }
+
+  .garage__actions {
+    .create-update__actions {
+      width: 68%;
     }
   }
-  
-  @media (max-width: 899px) {
-    .container {
-      width: 800px;
+
+  .track {
+    width: 575px;
+    .stopped-sign {
+      margin-left: 0px;
     }
-  
-    .track {
-      width: 475px;
+  }
+
+  .arrows {
+    font-size: 42px;
+  }
+}
+
+@media (max-width: 990px) {
+  .track {
+    width: 580px;
+  }
+}
+
+@media (max-width: 899px) {
+  .container {
+    width: 800px;
+  }
+
+  .track {
+    width: 475px;
+  }
+
+  .garage__actions {
+    .race__actions {
+      flex-direction: column;
+      gap: 2px;
     }
-  
-    .garage__actions {
-      .race__actions {
-        flex-direction: column;
-        gap: 2px;
-      }
-      .create-update__actions {
-        .c_u-input {
-          .color-create_btn {
-            width: 50px;
-            input,
-            button {
-              height: 23px;
-            }
-            button {
-              font-size: 12px;
-            }
+    .create-update__actions {
+      .c_u-input {
+        .color-create_btn {
+          width: 50px;
+          input,
+          button {
+            height: 23px;
+          }
+          button {
+            font-size: 12px;
           }
         }
       }
     }
-  
-    .race-btn,
-    .reset-btn {
-      height: 24px;
-      font-size: 15px;
-      font-weight: 400;
+  }
+
+  .race-btn,
+  .reset-btn {
+    height: 24px;
+    font-size: 15px;
+    font-weight: 400;
+    border: 2px solid;
+  }
+
+  .arrows {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 780px) {
+  .container {
+    width: 700px;
+  }
+
+  .garage__actions {
+    width: 699px;
+
+    .create-update__actions {
+      width: 72%;
+      .c_u-input {
+        .color-create_btn {
+          // width: 50px;
+          width: 10px;
+          input,
+          button {
+            height: 21px;
+          }
+          button {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+
+    .generate-btn {
+      width: 65px;
+      font-size: 11px;
       border: 2px solid;
     }
-  
-    .arrows {
-      font-size: 36px;
+  }
+
+  .line__actions {
+    width: 102px;
+    .car__actions {
+      button {
+        width: 60px;
+        margin-left: 0;
+        font-size: 12px;
+      }
+    }
+    .engine__actions {
+      button {
+        width: 37px;
+        mat-icon {
+          margin-top: 4px;
+          font-size: 19px;
+        }
+      }
     }
   }
-  
-  @media (max-width: 780px) {
-    .container {
-      width: 700px;
-    }
-  
-    .garage__actions {
-      width: 699px;
-  
-      .create-update__actions {
-        width: 72%;
-        .c_u-input {
-          .color-create_btn {
-            // width: 50px;
-            width: 10px;
-            input,
-            button {
-              height: 21px;
-            }
-            button {
-              font-size: 12px;
-            }
-          }
-        }
-      }
-  
-      .generate-btn {
-        width: 65px;
-        font-size: 11px;
-        border: 2px solid;
-      }
-    }
-  
-    .line__actions {
-      width: 102px;
-      .car__actions {
-        button {
-          width: 60px;
-          margin-left: 0;
-          font-size: 12px;
-        }
-      }
-      .engine__actions {
-        button {
-          width: 37px;
-          mat-icon {
-            margin-top: 4px;
-            font-size: 19px;
-          }
-        }
-      }
-    }
-  
-    .car {
-      svg {
-        width: 85px;
-      }
-    }
-  
-    .track {
-      width: 435px;
-      .car-name {
-        font-size: 22px;
-        letter-spacing: 8px;
-      }
-    }
-  
-    .arrows {
-      font-size: 30px;
+
+  .car {
+    svg {
+      width: 85px;
     }
   }
-  
-  @media (max-width: 500px) {
-    .container {
-      width: 670px;
-      margin-left: 15px;
+
+  .track {
+    width: 435px;
+    .car-name {
+      font-size: 22px;
+      letter-spacing: 8px;
     }
-  
-    .garage__actions {
-      width: 665px;
-      .create-update__actions {
-        width: 75%;
-        .c_u-input {
-          gap: 5px;
-          .create-input,
-          .update-input {
-            width: 55%;
-          }
-          .color-create_btn {
-            width: 25px;
-          }
+  }
+
+  .arrows {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 500px) {
+  .container {
+    width: 670px;
+    margin-left: 15px;
+  }
+
+  .garage__actions {
+    width: 665px;
+    .create-update__actions {
+      width: 75%;
+      .c_u-input {
+        gap: 5px;
+        .create-input,
+        .update-input {
+          width: 55%;
+        }
+        .color-create_btn {
+          width: 25px;
         }
       }
     }
-  
-    .btn {
-      width: 80px;
-    }
-  
-    .car {
-      svg {
-        width: 83px;
-      }
-    }
-  
-    .track {
-      width: 405px;
-    }
-  
-    .arrows {
-      font-size: 28px;
+  }
+
+  .btn {
+    width: 80px;
+  }
+
+  .car {
+    svg {
+      width: 83px;
     }
   }
-  
+
+  .track {
+    width: 405px;
+  }
+
+  .arrows {
+    font-size: 28px;
+  }
+}

@@ -71,34 +71,34 @@ const MIN_LENGTH_ERROR: string = 'This field must contain minimum 2 letters';
     LoadingSpinnerComponent,
   ],
   templateUrl: './garage.component.html',
-  styleUrls: ['./garage.component.scss','./garage.component2.scss'],
+  styleUrls: ['./garage.component.scss', './garage.component2.scss'],
 })
 export class GarageComponent
   implements OnInit, AfterViewInit, AfterContentInit
 {
   public cars: ICars[] = [];
-  public carElements: ElementRef[] = [];
   public carsPerPage: number = CARS_PER_PAGE;
   public currentPage: number = 1;
   public totalCount: number = 0;
   public selected: boolean = false;
-  selectedCarName: string = '';
-  updatingCarsId: number = 0;
+  private carElements: ElementRef[] = [];
+  private selectedCarName: string = '';
+  private updatingCarsId: number = 0;
 
-  dataLoading: boolean = true;
-  raceLoading: boolean = false;
-  generateLoading: boolean = false;
+  public dataLoading: boolean = true;
+  public raceLoading: boolean = false;
+  public generateLoading: boolean = false;
 
-  animationAction: string = 'stop';
-  animationStart: boolean = false;
-  individualAnimationStart: boolean = false;
+  
+  public animationStart: boolean = false;
+  public individualAnimationStart: boolean = false;
 
-  disableRaceButton: boolean = false;
-  disableResetButton: boolean = true;
-  disableIndividualRaceButton: boolean = false;
-  disableIndividualResetButton: boolean = true;
+  public disableRaceButton: boolean = false;
+  public disableResetButton: boolean = true;
+  public disableIndividualRaceButton: boolean = false;
+  public disableIndividualResetButton: boolean = true;
 
-  dataError: string = '';
+  public dataError: string = '';
 
   @ViewChildren('animatingCars') animatingCars!: QueryList<ElementRef>;
   workingCars: ICars[] = [];
@@ -163,7 +163,10 @@ export class GarageComponent
       },
       (err) => {
         this.dataLoading = false;
-        this.dataError = err.message;
+        this.disableRaceButton = true;
+        setTimeout(() => {
+          this.dataError = err.message;
+        }, 100);
         console.log('erererer', err);
       },
     );
@@ -291,12 +294,14 @@ export class GarageComponent
     if (formName === 'create') {
       this.creatingCarsName.reset();
       this.creatingCarsName.setValue('');
+      this.updatingCarsColor.setValue('#000000');
       this.creatingCarsName.markAsUntouched();
       this.creatingCarsNameError = '';
     }
     if (formName === 'update') {
       this.updatingCarsName.reset();
       this.updatingCarsName.setValue('');
+      this.updatingCarsColor.setValue('#000000');
       this.updatingCarsName.markAsUntouched();
       this.updatingCarsNameError = '';
     }
@@ -324,7 +329,6 @@ export class GarageComponent
         );
       }
     });
-
     // ! { Remove Car From Winners - 2 way
     // * I'll leave this code example here to show that
     // * I can use another way to remove a car from the winners,
@@ -457,9 +461,12 @@ export class GarageComponent
 
     if (status === 'started') {
       this.start_stopEngine(car.id, 'started');
-      car.started = true;
+      // car.started = true;
+      car.animationStarted = true;
       this.engineService.engineMode(car.id, 'drive').subscribe(
         (res) => {
+          car.animationStarted = false;
+          car.started = true;
           car.success = res.body?.success;
           this.individualAnimationStart = false;
           this.animationStart = true;
@@ -470,6 +477,8 @@ export class GarageComponent
         },
         () => {
           this.openSnackBar('Something wrong with cars engine');
+          car.animationStarted = false;
+          car.started = true;
           car.success = false;
           this.disableIndividualResetButton = false;
           this.disableResetButton = false;
