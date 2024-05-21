@@ -4,14 +4,13 @@ import { ICars } from '../Models/ICars';
 import { Observable, forkJoin } from 'rxjs';
 
 type TCar = Omit<ICars, 'id'>;
-
 @Injectable({
   providedIn: 'root',
 })
 export class CarsServivce {
-  carsUrl: string = 'http://127.0.0.1:3000/garage';
+  private carsUrl: string = 'http://127.0.0.1:3000/garage';
 
-  carNames: string[] = [
+  private carNames: string[] = [
     'Toyota Camry',
     'Honda Civic',
     'Ford Mustang',
@@ -113,7 +112,7 @@ export class CarsServivce {
     'Dodge Grand Caravan',
     'GMC Terrain',
   ];
-  carColors: string[] = [
+  private carColors: string[] = [
     '#FF0000',
     '#00FF00',
     '#0000FF',
@@ -219,7 +218,7 @@ export class CarsServivce {
 
   constructor(private http: HttpClient) {}
 
-  createCarList(): TCar[] {
+  private createCarList(): TCar[] {
     const carsList100: TCar[] = [];
     for (let i = 0; i < this.carNames.length; i++) {
       carsList100.push({
@@ -230,7 +229,7 @@ export class CarsServivce {
     return carsList100;
   }
 
-  getCars(limit: number, page: number) {
+  public getCars(limit: number, page: number) {
     return this.http.get<ICars[]>(
       `${this.carsUrl}?_limit=${limit}&&_page=${page}`,
       {
@@ -239,11 +238,11 @@ export class CarsServivce {
     );
   }
 
-  getCar(id: number) {
+  public getCar(id: number) {
     return this.http.get<ICars>(`${this.carsUrl}/${id}`);
   }
 
-  generateCars() {
+  public generateCars() {
     const observables: Observable<TCar>[] = [];
 
     this.createCarList().forEach((car) => {
@@ -259,7 +258,7 @@ export class CarsServivce {
     return forkJoin(observables);
   }
 
-  createCar(carName: string, carColor: string) {
+  public createCar(carName: string, carColor: string) {
     return this.http.post<TCar>(
       this.carsUrl,
       { name: carName, color: carColor },
@@ -267,7 +266,7 @@ export class CarsServivce {
     );
   }
 
-  updateCar(id: number, carNewName: string, carNewColor: string) {
+  public updateCar(id: number, carNewName: string, carNewColor: string) {
     return this.http.put<TCar>(
       `${this.carsUrl}/${id}`,
       { name: carNewName, color: carNewColor },
@@ -275,7 +274,7 @@ export class CarsServivce {
     );
   }
 
-  removeCar(id: number) {
+  public removeCar(id: number) {
     return this.http.delete(`${this.carsUrl}/${id}`);
     // ! I tried adding parameters this way, but it's not working.
     // let params = new HttpParams().set('id',id)

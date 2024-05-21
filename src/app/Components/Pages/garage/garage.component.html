@@ -3,7 +3,7 @@
     <div class="race__actions">
       <button
         (click)="overallRaceAdminister('start')"
-        [disabled]="disableRaceButton"
+        [disabled]="disableRaceButton || (cars.length === 0 && !dataLoading)"
         class="btn race-btn"
         [ngClass]="{ loadingBtn: raceLoading }"
       >
@@ -75,6 +75,7 @@
             type="Color"
             placeholder="Color"
             [formControl]="updatingCarsColor"
+            (change)="colorChanged = true"
           />
           <button
             mat-flat-button
@@ -92,7 +93,11 @@
       <button
         (click)="generateCarsAutomaticly()"
         class="generate-btn"
-        [ngClass]="{ loadingBtn: generateLoading }"
+        [ngClass]="{
+          loadingBtn: generateLoading,
+          generatebtn_hint:
+            cars.length === 0 && !dataLoading && !generateLoading && !dataError
+        }"
       >
         <span> Generate Cars </span>
       </button>
@@ -105,7 +110,6 @@
 
   <div class="garage__container">
     <div class="garage__racing-track">
-
       @if (dataLoading && cars.length == 0 && !dataError) {
         <div class="loading-spinner">
           <app-loading-spinner></app-loading-spinner>
@@ -114,7 +118,7 @@
         <div class="data-error">
           <p>{{ dataError }} - Error occurs from server</p>
         </div>
-      } @else if(cars.length === 0 && !dataLoading ){
+      } @else if (cars.length === 0 && !dataLoading) {
         <div class="no-data">
           <p>Sorry, dear fan, but not a single car came to the race today.</p>
         </div>
@@ -136,7 +140,7 @@
                 (click)="
                   individualCarAnimation(individualCarElement, car, 'started')
                 "
-                [disabled]="disableIndividualRaceButton || car.animationStarted"
+                [disabled]="car.animationStarted"
                 [ngClass]="{
                   loadingBtn: individualAnimationStart && car.animationStarted
                 }"
@@ -149,7 +153,9 @@
                 (click)="
                   individualCarAnimation(individualCarElement, car, 'stopped')
                 "
-                [disabled]="disableIndividualResetButton || !car.started"
+                [disabled]="
+                  disableIndividualResetButton || !car.animationStarted
+                "
               >
                 <mat-icon>replay</mat-icon>
               </button>

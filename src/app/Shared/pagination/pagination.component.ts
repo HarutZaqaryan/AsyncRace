@@ -12,9 +12,9 @@ const CARS_PER_PAGE: number = 3;
   styleUrl: './pagination.component.scss',
 })
 export class PaginationComponent {
-  @Input() currentPage = CURRENT_PAGE;
-  @Input() totalCount = TOTAL_COUNT;
-  @Input() carsPerPage = CARS_PER_PAGE;
+  @Input() currentPage: number = CURRENT_PAGE;
+  @Input() totalCount: number = TOTAL_COUNT;
+  @Input() carsPerPage: number = CARS_PER_PAGE;
 
   @Output() onPageChange: EventEmitter<number> = new EventEmitter();
 

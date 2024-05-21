@@ -6,7 +6,7 @@
     <ul>
       @for (winner of data; track winner) {
         <li>
-          <span class="winner-name">{{ winner.name }}</span> -
+          <span class="winner-name">{{ winner.name | titlecase }}</span> -
           <span class="winner-velocity">{{ winner.velocity }}ms</span>
         </li>
       }

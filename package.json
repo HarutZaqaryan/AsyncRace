@@ -7,7 +7,7 @@
     "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "eslint src/app --fix",
+    "lint": "eslint src/app",
     "format": "prettier --write \"src/**/*.+(ts|html|css|scss|json)\"",
     "ci:format": "prettier --check \"src/**/*.+(ts|html|css|scss|json)\"",
     "serve:ssr:Async-Race": "node dist/async-race/server/server.mjs"

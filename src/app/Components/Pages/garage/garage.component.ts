@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { CarsServivce } from '../../../Services/cars.service';
 import { ICars } from '../../../Models/ICars';
-import { HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { PaginationComponent } from '../../../Shared/pagination/pagination.component';
 import {
   FormControl,
@@ -31,6 +31,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 import { LoadingSpinnerComponent } from '../../../Shared/loading-spinner/loading-spinner.component';
+import { IDrive } from '../../../Models/IDrive';
 
 const CARS_PER_PAGE: number = 7;
 const NAME_MIN_LENGTH: number = 2;
@@ -49,7 +50,7 @@ const SCREEN_SIZE_SMALL: number = 500;
 const TRACK_DISTANCE_SMALL: number = 485;
 
 const MULTIPLE_TIMES: number = 2;
-const MULTIPLE_ZEROES: number = 10;
+const MULTIPLE_ZEROES: number = 20;
 
 const MIN_LENGTH_ERROR: string = 'This field must contain minimum 2 letters';
 
@@ -71,7 +72,10 @@ const MIN_LENGTH_ERROR: string = 'This field must contain minimum 2 letters';
     LoadingSpinnerComponent,
   ],
   templateUrl: './garage.component.html',
-  styleUrls: ['./garage.component.scss', './garage.component2.scss'],
+  styleUrls: [
+    './garage.component.scss',
+    './garage.component(Responsivity).scss',
+  ],
 })
 export class GarageComponent
   implements OnInit, AfterViewInit, AfterContentInit
@@ -89,13 +93,11 @@ export class GarageComponent
   public raceLoading: boolean = false;
   public generateLoading: boolean = false;
 
-  
   public animationStart: boolean = false;
   public individualAnimationStart: boolean = false;
 
   public disableRaceButton: boolean = false;
   public disableResetButton: boolean = true;
-  public disableIndividualRaceButton: boolean = false;
   public disableIndividualResetButton: boolean = true;
 
   public dataError: string = '';
@@ -117,6 +119,8 @@ export class GarageComponent
   ]);
   creatingCarsColor: FormControl = new FormControl('#000000');
   updatingCarsColor: FormControl = new FormControl('#000000');
+  colorChanged: boolean = false;
+
   UPDATE_SNACKBARS_MESSAGE: string = '';
 
   constructor(
@@ -130,10 +134,6 @@ export class GarageComponent
 
   ngOnInit(): void {
     this.dataError = '';
-    console.log('data error',this.dataError);
-    console.log('cars.length',this.cars.length);
-    console.log('data loading',this.dataLoading);
-    
     this.getCars(this.carsPerPage, this.currentPage);
   }
 
@@ -158,26 +158,22 @@ export class GarageComponent
     }, 0);
   }
 
-  getCars(limit: number, page: number): void {
+  private getCars(limit: number, page: number): void {
     this.carsService.getCars(limit, page).subscribe(
       (res: HttpResponse<ICars[]>) => {
         this.dataLoading = false;
         this.cars = res.body ?? [];
         this.totalCount = +res.headers.get('X-Total-Count')!;
-        console.log('res', res);
       },
       (err) => {
         this.dataLoading = false;
         this.disableRaceButton = true;
-        // setTimeout(() => {
-          this.dataError = err.name;
-        // }, 100);
-        console.log('erererer', err);
+        this.dataError = err.name;
       },
     );
   }
 
-  generateCarsAutomaticly(): void {
+  public generateCarsAutomaticly(): void {
     this.generateLoading = true;
     this.carsService.generateCars().subscribe(
       () => {
@@ -191,21 +187,29 @@ export class GarageComponent
     );
   }
 
-  existingCar(form: FormControl) {
+  private deepTrim(str: string): string {
+    return str.replace(/\s+/g, '');
+  }
+
+  // * The function checks for the presence of a car with the same name that the user is trying to add or update.
+  // * And returns it if it exists.
+  private existingCar(form: FormControl): ICars | undefined {
+    // I noticed that the function only works with those cars that are displayed on the current page.
+    // I could easily make it work for all cars by simply using another array that includes all the cars...
+
     const existingCar = this.cars.find(
-      (car) => car.name.toLocaleLowerCase() === form.value.toLocaleLowerCase(),
+      (car) =>
+        this.deepTrim(car.name.toLocaleLowerCase().trim()) ===
+        this.deepTrim(form.value.toLocaleLowerCase().trim()),
     );
+
     return existingCar;
   }
 
-  createCar() {
+  public createCar(): void {
     if (this.creatingCarsName.value !== '' && this.creatingCarsName.untouched) {
       if (this.creatingCarsName.status === 'VALID') {
-        if (
-          !this.existingCar(this.creatingCarsName) ||
-          this.creatingCarsName.value.toLocaleLowerCase() !==
-            this.existingCar(this.creatingCarsName)!.name.toLocaleLowerCase()
-        ) {
+        if (!this.existingCar(this.creatingCarsName)) {
           this.carsService
             .createCar(
               this.creatingCarsName.value,
@@ -239,30 +243,33 @@ export class GarageComponent
     }
   }
 
-  selectCar(id: number) {
-    this.selected = true;
+  public selectCar(id: number): void {
     const selectedCar = this.cars.find((car) => car.id === id);
+    this.selected = true;
     this.selectedCarName = selectedCar!.name;
     this.updatingCarsId = selectedCar!.id;
     this.updatingCarsName.setValue(selectedCar!.name);
     this.updatingCarsColor.setValue(selectedCar!.color);
   }
 
-  // * (Updated Car New Name) This line is collected externally because it is very long
-  getUpdatingCarName(name: string) {
-    return `"${this.titleCase(
-      this.selectedCarName,
-    )}" changed its name, now it performs under the name - "${this.titleCase(name)}"`;
+  private getUpdatingMessage(): string {
+    let message = '';
+    if (this.existingCar(this.updatingCarsName) && this.colorChanged) {
+      message = `${this.titleCase(this.existingCar(this.updatingCarsName)!.name)} changed its color to - " ${this.updatingCarsColor.value}"`;
+    } else if (!this.existingCar(this.updatingCarsName) && this.colorChanged) {
+      message = `${this.titleCase(this.selectedCarName)} changed its name and color. Now it performs under the name - "${this.titleCase(this.updatingCarsName.value)}"... And its color is - "${this.updatingCarsColor.value}"`;
+    } else if (!this.existingCar(this.updatingCarsName) && !this.colorChanged) {
+      message = `"${this.titleCase(
+        this.selectedCarName,
+      )}" changed its name, now it performs under the name - "${this.titleCase(this.updatingCarsName.value)}"`;
+    }
+    return message;
   }
 
-  updateCar() {
+  public updateCar(): void {
     if (this.updatingCarsName.value !== '' && this.updatingCarsName.untouched) {
       if (this.updatingCarsName.status === 'VALID') {
-        if (
-          !this.existingCar(this.updatingCarsName) ||
-          this.updatingCarsName.value.toLocaleLowerCase() !==
-            this.existingCar(this.updatingCarsName)!.name.toLocaleLowerCase()
-        ) {
+        if (!this.existingCar(this.updatingCarsName) || this.colorChanged) {
           this.carsService
             .updateCar(
               this.updatingCarsId,
@@ -271,9 +278,7 @@ export class GarageComponent
             )
             .subscribe(
               () => {
-                this.openSnackBar(
-                  this.getUpdatingCarName(this.updatingCarsName.value),
-                );
+                this.openSnackBar(this.getUpdatingMessage());
                 this.getCars(this.carsPerPage, this.currentPage);
                 this.resetInput('update');
               },
@@ -295,15 +300,17 @@ export class GarageComponent
     }
   }
 
-  resetInput(formName: string) {
+  public resetInput(formName: string): void {
     if (formName === 'create') {
       this.creatingCarsName.reset();
       this.creatingCarsName.setValue('');
-      this.updatingCarsColor.setValue('#000000');
+      this.creatingCarsColor.setValue('#000000');
       this.creatingCarsName.markAsUntouched();
       this.creatingCarsNameError = '';
     }
     if (formName === 'update') {
+      this.selected = false;
+      this.colorChanged = false;
       this.updatingCarsName.reset();
       this.updatingCarsName.setValue('');
       this.updatingCarsColor.setValue('#000000');
@@ -312,28 +319,29 @@ export class GarageComponent
     }
   }
 
-  onCreateInputBlur() {
-    this.creatingCarsName!.markAsUntouched();
+  private onCreateInputBlur(): void {
     this.creatingCarsNameError = '';
+    this.creatingCarsName!.markAsUntouched();
   }
 
-  onUpdateInputBlur() {
-    this.updatingCarsName!.markAsUntouched();
+  private onUpdateInputBlur(): void {
     this.updatingCarsNameError = '';
+    this.updatingCarsName!.markAsUntouched();
   }
 
-  removeCar(car: ICars) {
+  public removeCar(car: ICars): void {
     this.winnersService.getAllWinners().subscribe((res) => {
       const winner = res.find((winner) => winner.id === car.id);
       if (winner) {
         this.winnersService.deleteWinner(winner.id).subscribe(
-          (response) => console.log('response', response),
+          (response) => console.log('Delete Winner', response),
           (err) => {
             this.openSnackBar(err.message);
           },
         );
       }
     });
+
     // ! { Remove Car From Winners - 2 way
     // * I'll leave this code example here to show that
     // * I can use another way to remove a car from the winners,
@@ -360,14 +368,14 @@ export class GarageComponent
     });
   }
 
-  start_stopEngine(id: number, status: string) {
+  public start_stopEngine(id: number, status: string): void {
     this.disableRaceButton = true;
     const car = this.cars.find((car) => car.id === id);
     this.engineService.start_stopEngine(id, status).subscribe(
       (res) => {
         car!.velocity = res.velocity;
         car!.distance = res.distance;
-        console.log('from start-stop', status, car!.name, '-', car!.velocity);
+        console.log('From start-stop', status, car!.name, '-', car!.velocity);
       },
       (err) => {
         this.openSnackBar(err.message);
@@ -375,186 +383,300 @@ export class GarageComponent
     );
   }
 
-  overallRaceAdminister(action: string) {
+  // * The function begins processing racing operations
+  // * Depending on the action received.
+  public overallRaceAdminister(action: string): void {
     this.workingCars = [];
     if (action === 'start') {
-      this.disableIndividualRaceButton = true;
-      this.raceLoading = true;
-      const requests = this.cars.map((car) => {
-        this.start_stopEngine(car.id, 'started');
-        return this.engineService.engineMode(car.id, 'drive').pipe(
-          catchError((err) => {
-            this.start_stopEngine(car.id, 'stopped');
-            car.success = false;
-            return of(err);
-          }),
-        );
-      });
-      combineLatest(requests).subscribe((res) => {
-        res.forEach((result) => {
-          if (result.statusText === 'OK') {
-            const splitedUrl = result.url.split('=');
-            const workingCar = this.cars.find(
-              (car) => car.id == +splitedUrl[1].split('&')[0],
-            );
-            workingCar!.success = true;
-            this.workingCars.push(workingCar!);
-          } else {
-            if (result.status !== FAULTY_ENGINE_STATUS) {
-              this.openSnackBar(
-                "Someone hacked all the cars. We're trying to fix it.",
-              );
-            }
-          }
-        });
-        const screenWidth = window.screen.width;
-        // let trackDistance = (60.55 / 100) * screenWidth;
-        let trackDistance = DEFAULT_TRACK_DISTANCE;
-        if (screenWidth <= SCREEN_SIZE_BIGGEST) {
-          trackDistance = TRACK_DISTANCE_BIGGEST;
-        }
-        if (screenWidth <= SCREEN_SIZE_BIG) {
-          trackDistance = TRACK_DISTANCE_BIG;
-        }
-        if (screenWidth <= SCREEN_SIZE_MEDIUM) {
-          trackDistance = TRACK_DISTANCE_MEDIUM;
-        }
-        if (screenWidth <= SCREEN_SIZE_SMALL) {
-          trackDistance = TRACK_DISTANCE_SMALL;
-        }
-        this.raceLoading = false;
-        this.raceAnimation(
-          'start',
-          // screenWidth <= 970 ? Math.floor(trackDistance) : 775,
-          trackDistance,
-          this.workingCars,
-        );
-      });
+      this.handleRaceStart();
     } else {
-      this.cars.map((car) => {
-        this.start_stopEngine(car.id, 'stopped');
-        car.started = false;
-      });
-      this.raceAnimation('stop');
-      this.animationStart = false;
-      this.disableIndividualRaceButton = false;
-      this.disableIndividualResetButton = true;
+      this.handleRaceStop();
     }
   }
 
-  individualCarAnimation(
+  // * The function calculates the distance that cars must travel
+  // * Depending on the width of the screen.
+  private calculateTrackDistance(): number {
+    const screenWidth = window.screen.width;
+    if (screenWidth <= SCREEN_SIZE_SMALL) {
+      return TRACK_DISTANCE_SMALL;
+    } else if (screenWidth <= SCREEN_SIZE_MEDIUM) {
+      return TRACK_DISTANCE_MEDIUM;
+    } else if (screenWidth <= SCREEN_SIZE_BIG) {
+      return TRACK_DISTANCE_BIG;
+    } else if (screenWidth <= SCREEN_SIZE_BIGGEST) {
+      return TRACK_DISTANCE_BIGGEST;
+    } else {
+      return DEFAULT_TRACK_DISTANCE;
+    }
+  }
+
+  // * The function turns on the engines of all cars
+  // * And returns DRIVE_MODE requests
+  // * (no matter whether a successful result comes or error)
+  private setDriveMode(car: ICars) {
+    this.start_stopEngine(car.id, 'started');
+    return this.engineService.engineMode(car.id, 'drive').pipe(
+      catchError((err) => {
+        this.start_stopEngine(car.id, 'stopped');
+        car.success = false;
+        return of(err);
+      }),
+    );
+  }
+
+  // * The function takes car IDs from the URL of successful 'DRIVE_MODE' requests.
+  // * And returns them
+  private extractCarIdFromUrl(url: string | null): number {
+    return +url!.split('=')[1].split('&')[0];
+  }
+
+  // * The function takes all DIRVE_MODE requests.
+  // * Walks trough them, checks if 'cars' array include workingcar
+  // * And pushs all working cars to 'workingCars' array for further operations.
+  // ! If no car can race, it shows a notification.
+  private processRaceResults(
+    res: HttpResponse<IDrive>[] | HttpErrorResponse[],
+  ): void {
+    res.forEach((result) => {
+      if (result.statusText === 'OK') {
+        const carId = this.extractCarIdFromUrl(result.url);
+        const workingCar = this.cars.find((car) => car.id === carId);
+        if (workingCar) {
+          workingCar.success = true;
+          this.workingCars.push(workingCar);
+        }
+      } else if (result.status !== FAULTY_ENGINE_STATUS) {
+        this.openSnackBar(
+          "Someone hacked all the cars. We're trying to fix it.",
+        );
+      }
+    });
+  }
+
+  // * The function receives all 'DRIVE_MODE' requests,
+  // * Combines requests and passes them to the 'processRaceresults()' function.
+  // * In successful cases 'workingCars' array is filling with cars.
+  // * And 'raceAnimation' function receives his required parameters
+  private handleRaceStart(): void {
+    this.raceLoading = true;
+    this.cars.forEach((car) => {
+      car.animationStarted = true;
+    });
+    const requests = this.cars.map((car) => this.setDriveMode(car));
+    combineLatest(requests).subscribe((res) => {
+      this.processRaceResults(res);
+      const trackDistance = this.calculateTrackDistance();
+      this.raceLoading = false;
+      this.raceAnimation('start', trackDistance, this.workingCars);
+    });
+  }
+
+  // * The function turns off the engines of all cars
+  // * And returns them to their start position.
+  private handleRaceStop(): void {
+    this.cars.forEach((car) => {
+      this.start_stopEngine(car.id, 'stopped');
+      car.started = false;
+      car.animationStarted = false;
+    });
+    this.raceAnimation('stop');
+    this.animationStart = false;
+    this.disableIndividualResetButton = true;
+  }
+
+  // * The function begins processing individual car racing operations,
+  // * Depending on the action received.
+  public individualCarAnimation(
     carElement: HTMLDivElement,
     car: ICars,
     status: string,
-  ) {
+  ): void {
     this.individualAnimationStart = true;
-    const screenWidth = window.screen.width;
-    let trackDistance = DEFAULT_TRACK_DISTANCE;
+    this.cars.forEach((car) => (car.success = true));
 
-    if (screenWidth <= SCREEN_SIZE_BIGGEST) {
-      trackDistance = TRACK_DISTANCE_BIGGEST;
-    }
-    if (screenWidth <= SCREEN_SIZE_BIG) {
-      trackDistance = TRACK_DISTANCE_BIG;
-    }
-    if (screenWidth <= SCREEN_SIZE_MEDIUM) {
-      trackDistance = TRACK_DISTANCE_MEDIUM;
-    }
-    if (screenWidth <= SCREEN_SIZE_SMALL) {
-      trackDistance = TRACK_DISTANCE_SMALL;
-    }
+    const trackDistance = this.calculateTrackDistance();
 
     if (status === 'started') {
-      this.start_stopEngine(car.id, 'started');
-      // car.started = true;
-      car.animationStarted = true;
-      this.engineService.engineMode(car.id, 'drive').subscribe(
-        (res) => {
-          car.animationStarted = false;
-          car.started = true;
-          car.success = res.body?.success;
-          this.individualAnimationStart = false;
-          this.animationStart = true;
-          this.disableResetButton = false;
-          this.disableIndividualResetButton = false;
-          carElement.style.transition = `${car.velocity}0ms ease-in`;
-          carElement.style.transform = `translateX(${trackDistance}px)`;
-        },
-        () => {
-          this.openSnackBar('Something wrong with cars engine');
-          car.animationStarted = false;
-          car.started = true;
-          car.success = false;
-          this.disableIndividualResetButton = false;
-          this.disableResetButton = false;
-          this.individualAnimationStart = false;
-          this.animationStart = true;
-          this.start_stopEngine(car.id, 'stopped');
-        },
-      );
+      this.handleIndividualRaceStart(carElement, car, trackDistance);
     } else {
-      car.started = false;
-      this.animationStart = false;
-      this.disableIndividualRaceButton = false;
-      this.disableIndividualResetButton = false;
-      this.individualAnimationStart = false;
-      console.log('disable race button', this.disableIndividualRaceButton);
-      console.log('cars', this.cars);
-      const allStopped = this.cars.every((car) => !car.started);
-      if (allStopped) {
-        setTimeout(() => {
-          this.disableRaceButton = false;
-        }, 0);
-        this.disableResetButton = true;
-      }
-      this.start_stopEngine(car.id, 'stopped');
-      carElement.style.transition = '1ms ease-in';
-      carElement.style.transform = 'translateX(0px)';
+      this.handleIndividualRaceStop(carElement, car);
     }
   }
 
-  raceAnimation(action: string, trackDistance?: number, workingCars?: ICars[]) {
+  // * The function turns on the car engine, sets its velocity and distance,
+  // * And depending on the response of the “DRIVE_MODE” request begins racing operations.
+  private handleIndividualRaceStart(
+    carElement: HTMLDivElement,
+    car: ICars,
+    trackDistance: number,
+  ): void {
+    this.start_stopEngine(car.id, 'started');
+    car.animationStarted = true;
+
+    this.engineService.engineMode(car.id, 'drive').subscribe(
+      (res) => this.onDriveSuccess(res, car, carElement, trackDistance),
+      () => this.onDriveError(car),
+    );
+  }
+
+  // * The function manipulates action buttons(effects and disabling),
+  // * And starts race animation with received parameters(velocity & trackDIstance)
+  private onDriveSuccess(
+    res: HttpResponse<IDrive>,
+    car: ICars,
+    carElement: HTMLDivElement,
+    trackDistance: number,
+  ): void {
+    car.animationStarted = true;
+    car.started = true;
+    car.success = res.body?.success;
+    this.individualAnimationStart = false;
     this.animationStart = true;
-    this.carElements = [];
-    this.animatingCars.forEach((carElem: ElementRef) => {
-      this.carElements.push(carElem);
-    });
-    if (!workingCars?.length) {
+    this.disableResetButton = false;
+    this.disableIndividualResetButton = false;
+
+    carElement.style.transition = `${car.velocity}0ms ease-in`;
+    carElement.style.transform = `translateX(${trackDistance}px)`;
+  }
+
+  // * The function manipulates action buttons(in case when 'DRIVE_MODE' request returns error),
+  // * And stops car engine.
+  private onDriveError(car: ICars): void {
+    car.animationStarted = true;
+    car.started = true;
+    car.success = false;
+    this.disableResetButton = false;
+    this.disableIndividualResetButton = false;
+    this.individualAnimationStart = false;
+    this.animationStart = true;
+
+    this.openSnackBar(`Something is wrong with the ${car.name} engine`);
+    this.start_stopEngine(car.id, 'stopped');
+  }
+
+  // * The function manipulates action buttons(effects and disabling),
+  // * And returns the car to its start position.
+  private handleIndividualRaceStop(
+    carElement: HTMLDivElement,
+    car: ICars,
+  ): void {
+    car.started = false;
+    car.animationStarted = false;
+    this.animationStart = false;
+    this.disableIndividualResetButton = false;
+    this.individualAnimationStart = false;
+
+    const allStopped = this.cars.every((c) => !c.started);
+    if (allStopped) {
+      setTimeout(() => {
+        this.disableRaceButton = false;
+      }, 0);
       this.disableResetButton = true;
     }
+
+    this.start_stopEngine(car.id, 'stopped');
+    carElement.style.transition = '1ms ease-in';
+    carElement.style.transform = 'translateX(0px)';
+  }
+
+  // private raceAnimation(
+  //   action: string,
+  //   trackDistance?: number,
+  //   workingCars?: ICars[],
+  // ): void {
+  //   this.animationStart = true;
+  //   this.carElements = [];
+  //   this.animatingCars.forEach((carElem: ElementRef) => {
+  //     this.carElements.push(carElem);
+  //   });
+  //   if (!workingCars?.length) this.disableResetButton = true;
+  //   if (this.carElements) {
+  //     if (action === 'start') {
+  //       const workingCarIds: number[] = [];
+  //       workingCars!.map((workingCar) => {
+  //         workingCarIds.push(workingCar.id);
+  //       });
+  //       const workingCarHTMLelements: ElementRef[] = [];
+  //       this.carElements.forEach((carElem: ElementRef) => {
+  //         if (workingCarIds!.includes(+carElem.nativeElement.id)) {
+  //           workingCarHTMLelements.push(carElem);
+  //         }
+  //       });
+  //       workingCarHTMLelements.forEach((carElem: ElementRef, index) => {
+  //         carElem.nativeElement.style.transition = `${
+  //           workingCars![index].velocity
+  //         }0ms ease-in`;
+  //         carElem.nativeElement.style.transform = `translateX(${trackDistance}px)`;
+  //       });
+  //       this.disableResetButton = false;
+
+  //       if (workingCars?.length) this.getWinners(workingCars);
+  //     } else {
+  //       this.disableRaceButton = false;
+  //       this.disableResetButton = true;
+  //       this.carElements.forEach((carElem: ElementRef) => {
+  //         carElem.nativeElement.style.transition = '1ms ease-in';
+  //         carElem.nativeElement.style.transform = 'translateX(0px)';
+  //       });
+  //     }
+  //   }
+  // }
+
+  private raceAnimation(
+    action: string,
+    trackDistance?: number,
+    workingCars?: ICars[],
+  ): void {
+    this.animationStart = true;
+    this.carElements = this.animatingCars.map((carElem: ElementRef) => carElem);
+
+    if (!workingCars?.length) this.disableResetButton = true;
+
     if (this.carElements) {
       if (action === 'start') {
-        const workingCarIds: number[] = [];
-        workingCars!.map((workingCar) => {
-          workingCarIds.push(workingCar.id);
-        });
-        const workingCarHTMLelements: ElementRef[] = [];
-        this.carElements.forEach((carElem: ElementRef) => {
-          if (workingCarIds!.includes(+carElem.nativeElement.id)) {
-            workingCarHTMLelements.push(carElem);
-          }
-        });
-        workingCarHTMLelements.forEach((carElem: ElementRef, index) => {
-          carElem.nativeElement.style.transition = `${
-            workingCars![index].velocity
-          }0ms ease-in`;
-          carElem.nativeElement.style.transform = `translateX(${trackDistance}px)`;
-        });
-        this.disableResetButton = false;
-
-        if (workingCars?.length) this.getWinners(workingCars);
+        this.startRace(trackDistance, workingCars);
       } else {
-        this.disableRaceButton = false;
-        this.disableResetButton = true;
-        this.carElements.forEach((carElem: ElementRef) => {
-          carElem.nativeElement.style.transition = '1ms ease-in';
-          carElem.nativeElement.style.transform = 'translateX(0px)';
-        });
+        this.resetRace();
       }
     }
   }
 
-  getWinners(cars: ICars[]) {
+  private startRace(
+    trackDistance: number | undefined,
+    workingCars: ICars[] | undefined,
+  ) {
+    const workingCarIds: number[] = [];
+    workingCars!.map((workingCar) => {
+      workingCarIds.push(workingCar.id);
+    });
+    const workingCarHTMLelements: ElementRef[] = [];
+    this.carElements.forEach((carElem: ElementRef) => {
+      if (workingCarIds!.includes(+carElem.nativeElement.id)) {
+        workingCarHTMLelements.push(carElem);
+      }
+    });
+    workingCarHTMLelements.forEach((carElem: ElementRef, index) => {
+      carElem.nativeElement.style.transition = `${
+        workingCars![index].velocity
+      }0ms ease-in`;
+      carElem.nativeElement.style.transform = `translateX(${trackDistance}px)`;
+    });
+    this.disableResetButton = false;
+
+    if (workingCars?.length) this.getWinners(workingCars);
+  }
+
+  private resetRace() {
+    this.disableRaceButton = false;
+    this.disableResetButton = true;
+    this.carElements.forEach((carElem: ElementRef) => {
+      carElem.nativeElement.style.transition = '1ms ease-in';
+      carElem.nativeElement.style.transform = 'translateX(0px)';
+    });
+  }
+
+  private getWinners(cars: ICars[]): void {
     const carVelocities: number[] = [];
     const winners: ICars[] = [];
     cars.map((car) => {
@@ -578,7 +700,7 @@ export class GarageComponent
           this.winnersService
             .createWinner({ id: winner.id, wins: 1, time: winner.velocity! })
             .subscribe((res) => {
-              console.log(res);
+              console.log('winner', res);
             });
         },
       );
@@ -594,21 +716,20 @@ export class GarageComponent
     );
   }
 
-  titleCase(str: string) {
+  private titleCase(str: string): string {
     return str.toLowerCase().replace(/\b\w/g, function (char) {
       return char.toUpperCase();
     });
   }
 
-  openSnackBar(message: string) {
+  private openSnackBar(message: string): void {
     this._snackBar.open(message, undefined, {
-      duration: 3000,
+      duration: 3500,
     });
   }
 
-  onPageChange(page: number): void {
+  public onPageChange(page: number): void {
     this.currentPage = page;
-    console.log('current page', this.currentPage);
     this.getCars(this.carsPerPage, this.currentPage);
   }
 }

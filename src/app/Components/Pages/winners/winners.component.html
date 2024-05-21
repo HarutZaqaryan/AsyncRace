@@ -1,18 +1,14 @@
 <div class="winners__heading">WINNERS - {{ totalCount }}</div>
 
-@if (dataLoading) {
+@if (dataLoading && dataSource.length == 0 && !dataError) {
   <div class="loading-spinner">
     <app-loading-spinner></app-loading-spinner>
   </div>
-}
-
-@if (dataError) {
+} @else if (!dataLoading && dataError) {
   <div class="data-error">
-    <p>{{ dataError }}</p>
+    <p>{{ dataError }} - Error occurs from server</p>
   </div>
-}
-
-@if (dataSource.length === 0 && !dataLoading && !dataError) {
+} @else if (dataSource.length === 0 && !dataLoading) {
   <div class="no-data">
     <p>Sorry, dear fan, but there is no winner yet.</p>
   </div>

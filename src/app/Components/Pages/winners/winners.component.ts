@@ -25,14 +25,20 @@ const CARS_PER_PAGE: number = 5;
 })
 export class WinnersComponent implements OnInit {
   public dataLoading: boolean = true;
+
   public displayedColumns: string[] = ['id', 'car', 'name', 'wins', 'bestTime'];
   public dataSource: IWinnerDetails[] = [];
+
   public carsPerPage: number = CARS_PER_PAGE;
   public currentPage: number = 1;
   public totalCount: number = 0;
+
   public dataError: string = '';
+  public noData: boolean = false;
+
   private winners: IWinners[] = [];
   private winnerDetails: IWinnerDetails[] = [];
+
   private sorted: boolean = false;
   private sortBy: string = '';
   private sortTerm: string = '';
@@ -47,10 +53,23 @@ export class WinnersComponent implements OnInit {
     this.getWinners(this.carsPerPage, this.currentPage);
   }
 
-  getWinners(limit: number, page: number, sort?: string, order?: string): void {
+  // * The function get winners.
+  // * After that, he receives the car using his ID.
+  // * Connects the car and the winning details together.
+  // * And provides result to the dataSource table.
+  private getWinners(
+    limit: number,
+    page: number,
+    sort?: string,
+    order?: string,
+  ): void {
     this.winnersService.getWinners(limit, page, sort, order).subscribe(
       (response: HttpResponse<IWinners[]>) => {
         this.winners = response.body ?? [];
+        if (this.winners.length < 1) {
+          this.dataLoading = false;
+        }
+
         this.totalCount = +response.headers.get('X-Total-Count')!;
         const requests = this.winners.map((winner) => {
           return this.carsService.getCar(winner.id);
@@ -69,16 +88,12 @@ export class WinnersComponent implements OnInit {
       },
       (err) => {
         this.dataLoading = false;
-        this.dataError = err.message;
-        console.log('erererer', err);
+        this.dataError = err.name;
       },
     );
   }
 
-  sort(sortBy: string, order: string) {
-    console.log('this sortBy - ', this.sortBy);
-    console.log('sortBy + order - ', sortBy + order);
-
+  public sort(sortBy: string, order: string): void {
     if (sortBy + order === this.sortBy) {
       this.getWinners(this.carsPerPage, this.currentPage);
       this.sorted = false;
@@ -95,10 +110,9 @@ export class WinnersComponent implements OnInit {
     }
   }
 
-  onPageChange(page: number): void {
+  public onPageChange(page: number): void {
     this.winnerDetails = [];
     this.currentPage = page;
-    console.log('current page', this.currentPage);
     if (this.sorted) {
       this.getWinners(
         this.carsPerPage,

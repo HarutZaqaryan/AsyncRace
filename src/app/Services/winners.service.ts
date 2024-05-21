@@ -12,11 +12,16 @@ export class WinnersService {
 
   constructor(private http: HttpClient) {}
 
-  getAllWinners() {
+  public getAllWinners() {
     return this.http.get<IWinners[]>(this.winnersURL);
   }
 
-  getWinners(limit: number, page: number, sort?: string, order?: string) {
+  public getWinners(
+    limit: number,
+    page: number,
+    sort?: string,
+    order?: string,
+  ) {
     return this.http.get<IWinners[]>(
       sort
         ? `${this.winnersURL}?_limit=${limit}&&_page=${page}&&_sort=${sort}&&_order=${order}`
@@ -25,17 +30,17 @@ export class WinnersService {
     );
   }
 
-  getWinner(id: number) {
+  public getWinner(id: number) {
     return this.http.get<IWinners>(`${this.winnersURL}/${id}`);
   }
 
-  createWinner(winner: IWinners) {
+  public createWinner(winner: IWinners) {
     return this.http.post<IWinners>(this.winnersURL, winner, {
       headers: { 'Content-type': 'application/json' },
     });
   }
 
-  updateWinners(id: number, wins: number, time: number) {
+  public updateWinners(id: number, wins: number, time: number) {
     return this.http.put<TWinner>(
       `${this.winnersURL}/${id}`,
       { wins, time },
@@ -43,7 +48,7 @@ export class WinnersService {
     );
   }
 
-  deleteWinner(id: number) {
+  public deleteWinner(id: number) {
     return this.http.delete(`${this.winnersURL}/${id}`);
     // ! I tried adding parameters this way, but it's not working.
     // let params = new HttpParams().set('id',id)

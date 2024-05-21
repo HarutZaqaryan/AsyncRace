@@ -14,11 +14,12 @@ export class HeaderComponent {
 
   constructor(private router: Router) {}
 
-  garageBtnClick() {
+  public garageBtnClick(): void {
     this.router.navigate(['/', 'garage']);
     this.activeRoute = 'garage';
   }
-  winnersBtnClick() {
+
+  public winnersBtnClick(): void {
     this.router.navigate(['/', 'winners']);
     this.activeRoute = 'winners';
   }
