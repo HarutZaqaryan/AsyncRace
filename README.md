@@ -32,7 +32,7 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 
 ---- 
 
-# **Score - 355/370**
+# **Score - 360/370**
 
 ## 🏁 Basic Structure - (75 points)
 
@@ -126,9 +126,9 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 
 ---
 
-## 📏 Code Organization and Efficiency (10 points)
+## 📏 Code Organization and Efficiency (15 points)
 
-####   [+][-] Function Modularization - 5/10
+####   [+] Function Modularization - 10/10
 
 ####   [+] Code Duplication and Magic Numbers - 5/5
 
