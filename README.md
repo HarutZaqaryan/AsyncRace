@@ -12,9 +12,10 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 
 # Deployment
 
-## **The Front End** ### part of this project was deployed here - **[Deployment](https://harut-async-race.netlify.app/)**.
+## **Front End** 
+  * The Front End part of this project was deployed here - **[Deployment](https://harut-async-race.netlify.app/)**.
 
-## **For Back End**
+## **Back End**
   * Download [Api Repository](https://github.com/mikhama/async-race-api). 
   * Install json-server in downloaded directory(run `npm install json-server`).
   * Run the server `node index.js`.
