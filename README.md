@@ -12,12 +12,12 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 
 # Deployment
 
-**The Front End** part of this project was deployed here - **[Deployment](https://harut-async-race.netlify.app/)**.
+## **The Front End** part of this project was deployed here - **[Deployment](https://harut-async-race.netlify.app/)**.
 
--**For Back End**
- -Download [Api Repository](https://github.com/mikhama/async-race-api). 
- -Install json-server in downloaded directory(run `npm install json-server`).
- -Run the server `node index.js`.
+## **For Back End**
+  * Download [Api Repository](https://github.com/mikhama/async-race-api). 
+  * Install json-server in downloaded directory(run `npm install json-server`).
+  * Run the server `node index.js`.
 
 ---
 
@@ -37,107 +37,107 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 
 ### 1. View Configuration (20/30)
 
-#### - [x] Two Views - 10/10
+#### - [+] Two Views - 10/10
 
-#### - [x] Garage View Content - 5/5
+#### - [+] Garage View Content - 5/5
 
-#### - [x] Winners View Content - 5/5
+#### - [+] Winners View Content - 5/5
 
-#### - [ ] Persistent State 0/10
+#### - [-] Persistent State 0/10
 
 ### 2. Garage View Functionality (55/55)
 
-#### - [x] CRUD Operations - 20/20
+#### - [+] CRUD Operations - 20/20
 
-#### - [x] Color Section - 10/10
+#### - [+] Color Section - 10/10
 
-#### - [x] Management Buttons - 5/5
+#### - [+] Management Buttons - 5/5
 
-#### - [x] Pagination 10/10
+#### - [+] Pagination 10/10
 
-#### - [x] Random Car Creation - 10/10
+#### - [+] Random Car Creation - 10/10
 
 ---
 
 ## 🚗 Car Animation (50 points)
 
-#### - [x] Engine Control Buttons - 10/10
+#### - [+] Engine Control Buttons - 10/10
 
-#### - [x] Start Engine Animation - 20/20
+#### - [+] Start Engine Animation - 20/20
 
-#### - [x] Stop Engine Animation - 10/20
+#### - [+] Stop Engine Animation - 10/20
 
-#### - [x] Button States - 5/5
+#### - [+] Button States - 5/5
 
-#### - [x] Responsive Animation 5/5
+#### - [+] Responsive Animation 5/5
 
 ---
 
 ## 🏎️ Race Animation (35 points)
 
-#### - [x] Start Race Button - 15/15
+#### - [+] Start Race Button - 15/15
 
-#### - [x] Reset Race Button - 10/10
+#### - [+] Reset Race Button - 10/10
 
-#### - [x] Winner Announcement - 10/10
+#### - [+] Winner Announcement - 10/10
 
 ---
 
 ## 🏆 Winners View (45 points)
 
-#### - [x] Display Winners - 15/15
+#### - [+] Display Winners - 15/15
 
-#### - [x] Pagination For Winners - 10/10
+#### - [+] Pagination For Winners - 10/10
 
-#### - [x] Winners Table - 10/10
+#### - [+] Winners Table - 10/10
 
-#### - [x] Sorting Functionality - 10/10
+#### - [+] Sorting Functionality - 10/10
 
 ---
 
 ## 🏗️ Application Architecture (40 points)
 
-#### - [x] Modular Design(Components,Services,Shared etc.) - 40/40
+#### - [+] Modular Design(Components,Services,Shared etc.) - 40/40
 
 ---
 
 ## 📜 Dynamic Content Generation (30 points)
 
-#### - [x] JavaScript-Generated HTML Content - 30/30 ? (Using Angular)
+#### - [+] JavaScript-Generated HTML Content - 30/30 ? (Using Angular)
 
 ---
 
 ## 🌐 Single Page Application (25 points)
 
-#### - [x] SPA Implementation - 25/25
+#### - [+] SPA Implementation - 25/25
 
 ---
 
 ## 📦 Bundling and Tooling (20 points)
 
-#### - [x] Use of Webpack or Similiar - 20/20 ? (Using Angular)
+#### - [+] Use of Webpack or Similiar - 20/20 ? (Using Angular)
 
 ---
 
 ## ✅ Code Quality and Standards (15 points)
 
-#### - [x] Eslint with Airbnb Stye Guide - 15/15
+#### - [+] Eslint with Airbnb Stye Guide - 15/15
 
 ---
 
 ## 📏 Code Organization and Efficiency (10 points)
 
-#### - [x][-] Function Modularization - 5/10
+#### - [+][-] Function Modularization - 5/10
 
-#### - [x] Code Duplication and Magic Numbers - 5/5
+#### - [+] Code Duplication and Magic Numbers - 5/5
 
 ---
 
 ## 🎨 Prettier and ESLint Configuration (10 points)
 
-#### - [x] Prettier Setup - 5/5
+#### - [+] Prettier Setup - 5/5
 
-#### - [x] Eslint Configuration - 5/5
+#### - [+] Eslint Configuration - 5/5
 
 ---
 
