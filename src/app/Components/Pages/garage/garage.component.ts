@@ -383,8 +383,7 @@ export class GarageComponent
     );
   }
 
-  // * The function begins processing racing operations
-  // * Depending on the action received.
+
   public overallRaceAdminister(action: string): void {
     this.workingCars = [];
     if (action === 'start') {
@@ -394,8 +393,6 @@ export class GarageComponent
     }
   }
 
-  // * The function calculates the distance that cars must travel
-  // * Depending on the width of the screen.
   private calculateTrackDistance(): number {
     const screenWidth = window.screen.width;
     if (screenWidth <= SCREEN_SIZE_SMALL) {
@@ -579,49 +576,6 @@ export class GarageComponent
     carElement.style.transition = '1ms ease-in';
     carElement.style.transform = 'translateX(0px)';
   }
-
-  // private raceAnimation(
-  //   action: string,
-  //   trackDistance?: number,
-  //   workingCars?: ICars[],
-  // ): void {
-  //   this.animationStart = true;
-  //   this.carElements = [];
-  //   this.animatingCars.forEach((carElem: ElementRef) => {
-  //     this.carElements.push(carElem);
-  //   });
-  //   if (!workingCars?.length) this.disableResetButton = true;
-  //   if (this.carElements) {
-  //     if (action === 'start') {
-  //       const workingCarIds: number[] = [];
-  //       workingCars!.map((workingCar) => {
-  //         workingCarIds.push(workingCar.id);
-  //       });
-  //       const workingCarHTMLelements: ElementRef[] = [];
-  //       this.carElements.forEach((carElem: ElementRef) => {
-  //         if (workingCarIds!.includes(+carElem.nativeElement.id)) {
-  //           workingCarHTMLelements.push(carElem);
-  //         }
-  //       });
-  //       workingCarHTMLelements.forEach((carElem: ElementRef, index) => {
-  //         carElem.nativeElement.style.transition = `${
-  //           workingCars![index].velocity
-  //         }0ms ease-in`;
-  //         carElem.nativeElement.style.transform = `translateX(${trackDistance}px)`;
-  //       });
-  //       this.disableResetButton = false;
-
-  //       if (workingCars?.length) this.getWinners(workingCars);
-  //     } else {
-  //       this.disableRaceButton = false;
-  //       this.disableResetButton = true;
-  //       this.carElements.forEach((carElem: ElementRef) => {
-  //         carElem.nativeElement.style.transition = '1ms ease-in';
-  //         carElem.nativeElement.style.transform = 'translateX(0px)';
-  //       });
-  //     }
-  //   }
-  // }
 
   private raceAnimation(
     action: string,
